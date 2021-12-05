@@ -3,15 +3,11 @@ function install_PicoScenes_MATLAB_Toolbox(uninstall)
 
 if nargin == 0 
     startup;
-    path2ThisScript = which(mfilename);
-    toolSetPath = fileparts(path2ThisScript);
-    dot_verison_content = fileread([toolSetPath filesep '.version']);
-    lines = splitlines(dot_verison_content);
-    current_version_string = lines{1};
-    if which('package_n_install_batchloader')
-        package_n_install_batchloader;
-    end
-    disp(['PicoScenes MATLAB Toolbox [' toolSetPath ' ver.' current_version_string '] installed successfully!']);
+    pathFile = [userpath filesep 'PicoScenes-MATLAB-Toolbox-Path.txt'];
+    fid = fopen(pathFile);
+    toolSetPath = fgetl(fid);
+    fclose(fid);
+    disp(['PicoScenes MATLAB Toolbox [' toolSetPath '] installed successfully!']);
 elseif strcmp('uninstall', uninstall)
     userpath('reset');
     
@@ -19,11 +15,7 @@ elseif strcmp('uninstall', uninstall)
     if exist(pathFile, 'file')
         delete(pathFile);
     end
-    
-    startupFile = [userpath filesep 'startup.p'];
-    if exist(startupFile, 'file')
-        delete(startupFile);
-    end
+   
     
     startupMFile = [userpath filesep 'startup.m'];
     if exist(startupMFile, 'file')
