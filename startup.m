@@ -13,14 +13,14 @@ function startup()
     % disp(['Current startup.m file path: ' path2ThisScript]);
     cd (toolSetPath);
     cd ../;
-    if exist('SDR','dir') && exist('@RXSBundle','dir') && exist('@RTRXSBundle','dir')
+    if isfolder('SDR') && isfolder('@RXSBundle') && isfolder('@RTRXSBundle')
         toolSetPath = pwd;
         isInFatherDirectory = true;
     end
     
-    if exist('PicoScenes-MATLAB-Toolbox-Core','dir')
+    if isfolder('PicoScenes-MATLAB-Toolbox-Core')
         cd PicoScenes-MATLAB-Toolbox-Core/;
-    elseif exist('MATLAB','dir')
+    elseif isfolder('MATLAB')
         cd MATLAB/;
     end
 
