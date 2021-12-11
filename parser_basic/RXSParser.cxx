@@ -320,6 +320,8 @@ void transformExtraInfo2MatlabStruct(const ExtraInfo &ei, mxArray *mxExtraInfo) 
     mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "HasAGC"), createScalarMxArray(ei.hasAGC));
     mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "HasAntennaSelection"), createScalarMxArray(ei.hasAntennaSelection));
     mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "HasSamplingRate"), createScalarMxArray(ei.hasSamplingRate));
+    mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "HasTemperature"), createScalarMxArray(ei.hasTemperature));
+
 
     if (ei.hasLength) {
         mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "Length"), createScalarMxArray(ei.length));
@@ -413,6 +415,9 @@ void transformExtraInfo2MatlabStruct(const ExtraInfo &ei, mxArray *mxExtraInfo) 
     if (ei.hasSFO) {
         mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "SFO"), createScalarMxArray(double(ei.sfo)));
     }
+    if (ei.hasTemperature) {
+        mxSetFieldByNumber(mxExtraInfo, 0, mxAddField(mxExtraInfo, "Temperature"), createScalarMxArray(double(ei.temperature)));
+    }
 }
 
 mxArray *convertExtraInfo2MxArray(const ExtraInfo &ei) {
@@ -463,10 +468,20 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
 
 mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader) {
     auto *mvmExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "FMTClock"), createScalarMxArray<double>(mvmHeader.ftmClock));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "FTMClock"), createScalarMxArray<double>(mvmHeader.ftmClock));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "MuClock"), createScalarMxArray<double>(mvmHeader.muClock));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "RateNFlags"), createScalarMxArray(mvmHeader.rate_n_flags));
     return mvmExtraArray;
+}
+
+mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
+    auto *dpasRequestArray = mxCreateStructMatrix(1, 1, 0, NULL);
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchId"), createScalarMxArray<double>(request.batchId));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchLength"), createScalarMxArray<double>(request.batchLength));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"), createScalarMxArray(request.sequenceId));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray(request.intervalTime));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray(request.intervalStep));
+    return dpasRequestArray;
 }
 
 void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *outCell, int index) {
@@ -482,6 +497,11 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     if (frame.mvmExtraSegment) {
         auto *mvmExtraArray = convertMVMExtraSegment2MXArray(frame.mvmExtraSegment->getMvmExtra().parsedHeader);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MVMExtra"), mvmExtraArray);
+    }
+
+    if (frame.dpasRequestSegment) {
+        auto *dpasRequestArray = convertDPASRequestSegment2MXArray(frame.dpasRequestSegment->getRequest());
+        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "DPASRequest"), dpasRequestArray);
     }
 
     auto *rxCSIGroups = convertCSISegment2MxArray(frame.csiSegment);

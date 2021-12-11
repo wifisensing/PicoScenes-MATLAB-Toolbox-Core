@@ -48,7 +48,7 @@ function [rxs_struct] = CombineRXSStructs (rxs_struct_array)
     else
         PilotCSI = {};
         LegacyCSI = {};
-        basebandSignals = {};
+        BasebandSignals = {};
         PreEQSymbols = {};
     end
 
@@ -84,6 +84,12 @@ function [rxs_struct] = CombineRXSStructs (rxs_struct_array)
         meregedMVMExtra = [];
     end
 
+    if isfield(rxs_struct_array, 'DPASRequest')
+        mergedDPASRequests = combineDPASRequestSegment([rxs_struct_array.DPASRequest].');
+    else
+        mergedDPASRequests = [];
+    end
+
     Channel = mergedCSI;
     Channel = rmfield(Channel, {'CSI', 'Mag', 'Phase', 'SubcarrierIndex'});
 
@@ -93,13 +99,14 @@ function [rxs_struct] = CombineRXSStructs (rxs_struct_array)
     rxs_struct.TxExtraInfo = mergedTxExtraInfo;
     rxs_struct.Channel = Channel;
     rxs_struct.MVMExtra = meregedMVMExtra;
+    rxs_struct.DPASRequest = mergedDPASRequests;
     rxs_struct.CSI = mergedCSI.CSI;
     rxs_struct.Mag = mergedCSI.Mag;
     rxs_struct.Phase = mergedCSI.Phase;
     rxs_struct.SubcarrierIndex = mergedCSI.SubcarrierIndex;
     rxs_struct.Baseband.PilotCSI = PilotCSI;
     rxs_struct.Baseband.LegacyCSI = LegacyCSI;
-    rxs_struct.Baseband.BasebandSignals = basebandSignals;
+    rxs_struct.Baseband.BasebandSignals = BasebandSignals;
     rxs_struct.Baseband.PreEQSymbols = PreEQSymbols;
 end
 
@@ -317,11 +324,15 @@ function extraInfoBundle = combineExtraInfoSlots(ExtraInfos)
     if isfield(ExtraInfos, 'SFO')
         extraInfoBundle.SFO = [ExtraInfos.SFO]';
     end
+
+    if isfield(ExtraInfos, 'Temperature')
+        extraInfoBundle.Temperature = [ExtraInfos.Temperature]';
+    end
 end
 
 function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
     confirmArray = [
-                "FMTClock";
+                "FTMClock";
                 "MuClock";
                 "RateNFlags";
                 ];
@@ -335,6 +346,30 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
             NVMExtra.(confirmArray(i)) = cell2mat({originalNVMExtra.(confirmArray(i))}');
         elseif isvector(singleField) && iscol(singleField)
             NVMExtra.(confirmArray(i)) = cell2mat({originalNVMExtra.(confirmArray(i))});
+        end
+
+    end
+
+end
+
+function dpasRequest = combineDPASRequestSegment(originalDPASRequest)
+    confirmArray = [
+                "BatchId";
+                "BatchLength";
+                "Sequence";
+                "Interval";
+                "Step";
+                ];
+
+    for i = 1:size(confirmArray, 1)
+        singleField = originalDPASRequest.(confirmArray(i));
+
+        if isscalar(singleField)
+            dpasRequest.(confirmArray(i)) = [originalDPASRequest.(confirmArray(i))].';
+        elseif isvector(singleField) && isrow(singleField)
+            dpasRequest.(confirmArray(i)) = cell2mat({originalDPASRequest.(confirmArray(i))}');
+        elseif isvector(singleField) && iscol(singleField)
+            dpasRequest.(confirmArray(i)) = cell2mat({originalDPASRequest.(confirmArray(i))});
         end
 
     end
