@@ -1,5 +1,20 @@
 # Changelog of PicoScenes MATLAB Toolbox (PMT)
 
+## Dec. 9, 2021
+    * [Parser] Fix typo error for MVMExtra.FTMClock
+
+## Nov. 4, 2021
+    * [Rxs-Parsing-Core] regular update
+
+## Dec. 3, 2021
+    * [Parser] fix bug in parseRXSBundle.m
+
+## Nov. 26, 2021
+    * [Rxs-Parsing-Core] decode ExtraInfo temperature
+
+## Nov. 22, 2021
+    * [Rxs-Parsing-Core] Fix bug in CSISegment v4
+
 ## Nov. 18, 2021
     * [Update] Remove old RXSParser during update
 
