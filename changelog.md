@@ -1,5 +1,8 @@
 # Changelog of PicoScenes MATLAB Toolbox (PMT)
 
+## Dec. 14, 2021
+    * [Rxs-Parsing-Core] regular update
+
 ## Dec. 9, 2021
     * [Parser] Fix typo error for MVMExtra.FTMClock
 
