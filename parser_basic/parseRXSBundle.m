@@ -237,7 +237,7 @@ function extraInfoBundle = combineExtraInfoSlots(ExtraInfos)
 
     if isfield(ExtraInfos, 'BMode')
         txbmode = [ExtraInfos.BMode]';
-        extraInfoBundle.txbmode = txbmode;
+        extraInfoBundle.BMode = txbmode;
     end
 
     if isfield(ExtraInfos, 'MACAddressROM')

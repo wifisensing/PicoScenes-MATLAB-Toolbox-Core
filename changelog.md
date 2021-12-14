@@ -2,6 +2,7 @@
 
 ## Dec. 14, 2021
     * [Rxs-Parsing-Core] regular update
+    * [Parser] Fix bug in ExtraInfo parsing for QCA9300
 
 ## Dec. 9, 2021
     * [Parser] Fix typo error for MVMExtra.FTMClock
