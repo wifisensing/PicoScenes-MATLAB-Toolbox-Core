@@ -1,5 +1,8 @@
 # Changelog of PicoScenes MATLAB Toolbox (PMT)
 
+## Dec. 16, 2021
+    * [Toolbox] Fix bug in startup.m
+
 ## Dec. 14, 2021
     * [Rxs-Parsing-Core] regular update
     * [Parser] Fix bug in ExtraInfo parsing for QCA9300
