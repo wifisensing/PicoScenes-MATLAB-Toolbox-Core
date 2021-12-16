@@ -1,7 +1,7 @@
 # Changelog of PicoScenes MATLAB Toolbox (PMT)
 
 ## Dec. 16, 2021
-    * [Toolbox] Fix bug in startup.m
+    * [Toolbox] Fix bug in startup.m; exclude .git from search path
 
 ## Dec. 14, 2021
     * [Rxs-Parsing-Core] regular update
