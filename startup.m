@@ -49,13 +49,13 @@ function startup()
         copyfile(path2ThisScript, userpath);
         writePath(toolSetPath,isInFatherDirectory);
         toolSetPath = readToolSetPath();
-        addpath(genpath(toolSetPath));
+        addpath(genpathExcludeGit(toolSetPath));
     end
     
     if isInUserPath == true
         [toolSetPath,isInFatherDirectory] = readToolSetPath();
         disp(['PicoScenes MATLAB Toolbox [' toolSetPath '] added to the MATLAB search path.']);
-        addpath(genpath(toolSetPath));
+        addpath(genpathExcludeGit(toolSetPath));
 
         if(strcmp(isInFatherDirectory,'true'))
             startupScriptPathInToolSet = [readToolSetPath filesep 'PicoScenes-MATLAB-Toolbox-Core' filesep 'startup.m'];
@@ -87,4 +87,12 @@ function [toolSetPath,isInFatherDirectory] = readToolSetPath()
     toolSetPath = fgetl(fid);
     isInFatherDirectory = fgetl(fid);
     fclose(fid);
+end
+
+function gitFreePath = genpathExcludeGit(toolboxPath)
+    allpath = genpath(toolboxPath);
+    splitPath = split(allpath, pathsep);
+    hasPattern = contains(splitPath, '.git');
+    excluded = splitPath(~hasPattern);
+    gitFreePath = char(strjoin(excluded, pathsep));
 end
