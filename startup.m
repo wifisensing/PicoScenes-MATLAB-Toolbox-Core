@@ -58,7 +58,7 @@ function startup()
         addpath(genpath(toolSetPath));
 
         if(strcmp(isInFatherDirectory,'true'))
-            startupScriptPathInToolSet = [readToolSetPath filesep 'PicoScenes-MATLAB-Toolbox-Core\startup.m'];
+            startupScriptPathInToolSet = [readToolSetPath filesep 'PicoScenes-MATLAB-Toolbox-Core' filesep 'startup.m'];
         else
             startupScriptPathInToolSet = [readToolSetPath filesep 'startup.m'];
         end
