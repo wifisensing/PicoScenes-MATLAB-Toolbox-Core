@@ -7,7 +7,7 @@ This repo holds the open-sourced part of the larger PicoSenes MATLAB Toolbox (PM
 ## How to clone this repo?
 
 This repo depends on the RXS-Parsing-Core lib via git submodule, so you should clone this repo with **--recursive** option like
-``git clone https://gitlab.com/wifisensing/PicoScenes-MATLAB-Toolbox-Core --resursive``
+``git clone https://gitlab.com/wifisensing/PicoScenes-MATLAB-Toolbox-Core --recursive``
 
 # Documentation?
 
