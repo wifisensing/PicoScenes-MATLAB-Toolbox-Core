@@ -359,6 +359,8 @@ function dpasRequest = combineDPASRequestSegment(originalDPASRequest)
                 "Sequence";
                 "Interval";
                 "Step";
+                "CarrierFrequency";
+                "SamplingRate";
                 ];
 
     for i = 1:size(confirmArray, 1)
