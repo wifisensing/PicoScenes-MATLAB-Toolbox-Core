@@ -478,9 +478,12 @@ mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
     auto *dpasRequestArray = mxCreateStructMatrix(1, 1, 0, NULL);
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchId"), createScalarMxArray<double>(request.batchId));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchLength"), createScalarMxArray<double>(request.batchLength));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"), createScalarMxArray(request.sequenceId));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray(request.intervalTime));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray(request.intervalStep));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"), createScalarMxArray(double(request.sequenceId)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray(double(request.intervalTime)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray(double(request.intervalStep)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "CarrierFrequency"), createScalarMxArray(double(request.carrierFrequency)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "SamplingRate"), createScalarMxArray(double(request.samplingFrequency)));
+
     return dpasRequestArray;
 }
 
