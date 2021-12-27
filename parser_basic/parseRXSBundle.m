@@ -359,6 +359,7 @@ function dpasRequest = combineDPASRequestSegment(originalDPASRequest)
                 "Sequence";
                 "Interval";
                 "Step";
+                "DeviceType",
                 "CarrierFrequency";
                 "SamplingRate";
                 ];

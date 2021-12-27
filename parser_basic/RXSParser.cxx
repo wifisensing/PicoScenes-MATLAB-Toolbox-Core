@@ -481,6 +481,7 @@ mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"), createScalarMxArray(double(request.sequenceId)));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray(double(request.intervalTime)));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray(double(request.intervalStep)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceType"), createScalarMxArray(uint16_t(request.deviceType)));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "CarrierFrequency"), createScalarMxArray(double(request.carrierFrequency)));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "SamplingRate"), createScalarMxArray(double(request.samplingFrequency)));
 
