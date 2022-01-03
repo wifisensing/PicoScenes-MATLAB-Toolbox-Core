@@ -354,12 +354,14 @@ end
 
 function dpasRequest = combineDPASRequestSegment(originalDPASRequest)
     confirmArray = [
+                "RequestMode",
                 "BatchId";
                 "BatchLength";
                 "Sequence";
                 "Interval";
                 "Step";
                 "DeviceType",
+                "DeviceSubtype",
                 "CarrierFrequency";
                 "SamplingRate";
                 ];
