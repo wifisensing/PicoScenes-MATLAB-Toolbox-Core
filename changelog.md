@@ -1,5 +1,8 @@
 # Changelog of PicoScenes MATLAB Toolbox (PMT)
 
+## Jan. 18, 2022
+    * [Rxs-Parsing-Core] regular update
+
 ## Dec. 28, 2021
     * [Rxs-Parsing-Core] regular update
 
