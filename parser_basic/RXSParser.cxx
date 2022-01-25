@@ -597,7 +597,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             convertPicoScenesFrame2Struct(*frame, result, 1);  // fake the ack frame for the structual simplicity
             const auto &csiPayload = echoProbeCSIPayloadIt->getPayload().payloadData;
             auto txCSISegment = CSISegment::createByBuffer(csiPayload.data(), csiPayload.size());
-            txCSISegment.getCSI().interpolateCSI();
+            txCSISegment.getCSI().removeCSDAndInterpolateCSI();
             auto *rxCSIGroups = convertCSISegment2MxArray(txCSISegment);
             mxSetFieldByNumber(result, 1, mxAddField(result, "CSI"), rxCSIGroups);
         }

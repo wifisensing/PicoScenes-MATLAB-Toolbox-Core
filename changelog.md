@@ -1,5 +1,8 @@
 # Changelog of PicoScenes MATLAB Toolbox (PMT)
 
+## Jan. 26, 2021
+    * [Rxs-Parsing-Core] CSD removal is now integrated in parsing-core.
+
 ## Jan. 18, 2022
     * [Rxs-Parsing-Core] regular update
 
