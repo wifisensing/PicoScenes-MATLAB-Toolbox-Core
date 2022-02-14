@@ -3,6 +3,7 @@
 ## Feb. 16, 2022
     * [Parser] Add parser for PicoScenes .bbsignals file (baseband signal recording format used by PicoScenes).
         .bbsignals files can be decoded by double-click in MATLAB Current Folder or drag'n'drop.
+    * [Samples] Add a sample .bbsignals file, which records the baseband signals of a HE-SU format frame
 
 ## Jan. 26, 2022
     * [Rxs-Parsing-Core] CSD removal is now integrated in parsing-core.
