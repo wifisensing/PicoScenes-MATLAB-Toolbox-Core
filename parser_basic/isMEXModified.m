@@ -25,7 +25,7 @@ for i = 1 : numHXXFile
     targetHashStr = strcat(targetHashStr,hxxHashStr);
 end
 
-cd preprocessor/generated/;
+cd interpolationAndCSDRemoval/generated/;
 genFileList = dir;
 numGenFile = length(genFileList);
 for i = 1 : numGenFile
