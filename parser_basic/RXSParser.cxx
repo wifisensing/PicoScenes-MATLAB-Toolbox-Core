@@ -478,14 +478,15 @@ mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
     auto *dpasRequestArray = mxCreateStructMatrix(1, 1, 0, NULL);
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "RequestMode"), createScalarMxArray<double>(request.requestMode));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchId"), createScalarMxArray<double>(request.batchId));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Stage"), createScalarMxArray<double>(request.stage));
     mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchLength"), createScalarMxArray<double>(request.batchLength));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"), createScalarMxArray(double(request.sequenceId)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray(double(request.intervalTime)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray(double(request.intervalStep)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceType"), createScalarMxArray(uint16_t(request.deviceType)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceSubtype"), createScalarMxArray(uint16_t(request.deviceSubtype)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "CarrierFrequency"), createScalarMxArray(double(request.carrierFrequency)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "SamplingRate"), createScalarMxArray(double(request.samplingFrequency)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"),createScalarMxArray<double>(request.sequenceId));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray<double>(request.intervalTime));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray<double>(request.intervalStep));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceType"), createScalarMxArray<double>(uint16_t(request.deviceType)));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceSubtype"), createScalarMxArray<double>(request.deviceSubtype));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "CarrierFrequency"), createScalarMxArray<double>(request.carrierFrequency));
+    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "SamplingRate"), createScalarMxArray<double>(request.samplingFrequency));
 
     return dpasRequestArray;
 }

@@ -356,6 +356,7 @@ function dpasRequest = combineDPASRequestSegment(originalDPASRequest)
     confirmArray = [
                 "RequestMode",
                 "BatchId";
+                "Stage";
                 "BatchLength";
                 "Sequence";
                 "Interval";
