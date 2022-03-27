@@ -32,7 +32,7 @@ function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
             dimensions(i) = fread(fid, 1, 'int64=>double');
          end
     end
-    isComplexMatrix = fread(fid, 1, 'char=>double') == 'C';
+    isComplexMatrix = double(fread(fid, 1, 'char=>double') == 'C');
     typeChar = fread(fid, 1, 'char=>double');
     typeBits = fread(fid, 1, 'uint8=>double');
     majority = SignalStorageMajority(fread(fid, 1, 'uint8=>double'));
