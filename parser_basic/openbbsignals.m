@@ -1,33 +1,41 @@
-function openbbsignals(filePath)
+function openbbsignals(filePath, varargin)
+
+if isempty(varargin)
+    skipLength = 0;
+    readLength = inf;
+else
+    skipLength = varargin{1};
+    readLength = varargin{2};
+end
 
 [~,fileName,extension] = fileparts(filePath);
 validName = matlab.lang.makeValidName(fileName);
 disp(['Loading PicoScenes SDR baseband signal file: ' fileName extension]);
-bb_signal = loadBasebandSignalFile(filePath);
+bb_signal = loadBasebandSignalFile(filePath, skipLength, readLength);
 assignin('base', validName, bb_signal);
 disp(['Loaded variable name: ' validName]);
 
 end
 
-function data = loadBasebandSignalFile(bbFilePath)
+function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
     fid = fopen(bbFilePath);
     fileHeader = fread(fid, 2, 'char=>char');
     bbFileVersion = fread(fid, 2, 'char=>char');
-    numDimensions = fread(fid, 1, 'uint8=>uint8');
+    numDimensions = fread(fid, 1, 'uint8=>double');
     dimensions = ones(1, numDimensions);
     if bbFileVersion(2) - 48 == 1
         for i = 1: numDimensions
-            dimensions(i) = fread(fid, 1, 'int32=>int32');
+            dimensions(i) = fread(fid, 1, 'int32=>double');
          end
     elseif bbFileVersion(2) - 48  == 2
         for i = 1: numDimensions
-            dimensions(i) = fread(fid, 1, 'int64=>int64');
+            dimensions(i) = fread(fid, 1, 'int64=>double');
          end
     end
-    isComplexMatrix = fread(fid, 1, 'char=>char') == 'C';
-    typeChar = fread(fid, 1, 'char=>char');
-    typeBits = fread(fid, 1, 'uint8=>uint8');
-    majority = SignalStorageMajority(fread(fid, 1, 'uint8=>uint8'));
+    isComplexMatrix = fread(fid, 1, 'char=>double') == 'C';
+    typeChar = fread(fid, 1, 'char=>double');
+    typeBits = fread(fid, 1, 'uint8=>double');
+    majority = SignalStorageMajority(fread(fid, 1, 'uint8=>double'));
 
     if any(fileHeader' ~= 'BB') || (any(bbFileVersion' ~= 'v1') && any(bbFileVersion' ~= 'v2'))
         error(' ** incompatible .bbsignals file format! **');
@@ -47,7 +55,11 @@ function data = loadBasebandSignalFile(bbFilePath)
     precision = [precision num2str(typeBits)];
     precision = [precision '=>' precision];
 
-    data = fread(fid, inf, precision);
+    skipBytes = typeBits * skipLength / 8 * 2^isComplexMatrix * dimensions(2);
+    readBytes = readLength * 2^isComplexMatrix * dimensions(2);
+
+    fseek(fid, skipBytes, 'cof');
+    data = fread(fid, readBytes, precision);
     if isComplexMatrix
         data = reshape(data, 2, []).';
         data = complex(data(:,1), data(:,2));
