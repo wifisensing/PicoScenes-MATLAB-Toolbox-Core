@@ -40,16 +40,20 @@ function [rxs_struct] = CombineRXSStructs (rxs_struct_array)
     end
     originTxExtraInfo = [rxs_struct_array.TxExtraInfo].';
     
+    PilotCSI = {};
+    LegacyCSI = {};
+    BasebandSignals = {};
+    PreEQSymbols = {};
     if isfield(rxs_struct_array, 'BasebandSignals')
-        PilotCSI = {rxs_struct_array.PilotCSI}.';
-        LegacyCSI = {rxs_struct_array.LegacyCSI}.';
+        if isfield(rxs_struct_array, 'PilotCSI')
+            PilotCSI = {rxs_struct_array.PilotCSI}.';
+        end
+
+        if isfield(rxs_struct_array, 'LegacyCSI')
+            LegacyCSI = {rxs_struct_array.LegacyCSI}.';
+        end
         BasebandSignals = {rxs_struct_array.BasebandSignals}.';
         PreEQSymbols = {rxs_struct_array.PreEQSymbols}.';
-    else
-        PilotCSI = {};
-        LegacyCSI = {};
-        BasebandSignals = {};
-        PreEQSymbols = {};
     end
 
     mergedRxSBasic = combineRxSBasic(originRxSBasic);
