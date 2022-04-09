@@ -13,7 +13,7 @@ function startup()
     % disp(['Current startup.m file path: ' path2ThisScript]);
     cd (toolSetPath);
     cd ../;
-    if isfolder('SDR') && isfolder('@RXSBundle') && isfolder('@RTRXSBundle')
+    if isfolder('@RXSBundle')
         toolSetPath = pwd;
         isInFatherDirectory = true;
     end
