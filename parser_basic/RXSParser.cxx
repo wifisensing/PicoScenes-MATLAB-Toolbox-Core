@@ -445,18 +445,18 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumCSI"), createScalarMxArray(csi.dimensions.numCSI));
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "ANTSEL"), createScalarMxArray(csi.dimensions.numESS));
 
-        std::vector<mwSize> sizes {csi.dimensions.numTones, mwSize(csi.dimensions.numTx + csi.dimensions.numESS), csi.dimensions.numRx, csi.dimensions.numCSI};
+        std::vector<mwSize> csiDataDimensions {csi.dimensions.numTones, mwSize(csi.dimensions.numTx + csi.dimensions.numESS), csi.dimensions.numRx, csi.dimensions.numCSI};
 
         /*
         * csiData is essentially an N_{sc} x N_{sts} x N_{rx} x N_{CSI} 4-D matrix; The output order is the 1-D reshaped output format, like reshape(csiData, [], 1);
         */
-        auto *CSIData = copyComplexData2MxArray<double, double>(&csi.CSIArray.array[0], csi.CSIArray.array.size());
+        auto *CSIData = copyComplexData2MxArray<double, double>(&csi.CSIArray.array[0], csi.CSIArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "CSI"), CSIData);
 
-        auto *magData = copyData2MxArray<double, double>(&csi.magnitudeArray.array[0], csi.magnitudeArray.array.size());
+        auto *magData = copyData2MxArray<double, double>(&csi.magnitudeArray.array[0], csi.magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "Mag"), magData);
 
-        auto *phaseData = copyData2MxArray<double, double>(&csi.phaseArray.array[0], csi.phaseArray.array.size());
+        auto *phaseData = copyData2MxArray<double, double>(&csi.phaseArray.array[0], csi.phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "Phase"), phaseData);
 
         auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi.subcarrierIndices[0], csi.subcarrierIndices.size());
