@@ -151,12 +151,9 @@ function CSI = combineCSI(originCSI)
                 "SubcarrierBandwidth";
                 "NumTones";
                 "NumTx";
-                "NumRx";
                 "NumESS";
+                "NumRx";
                 "ANTSEL";
-                "CSI";
-                "Mag";
-                "Phase";
                 "SubcarrierIndex";
                 ];
 
@@ -170,8 +167,12 @@ function CSI = combineCSI(originCSI)
         elseif isvector(singleField) && iscolumn(singleField)
             CSI.(confirmArray(i)) = cell2mat({originCSI.(confirmArray(i))});
         end
-
     end
+
+    CSI.CSI = cell2mat(arrayfun(@(x) x.CSI(:).', originCSI, 'UniformOutput', false));
+    CSI.Mag = cell2mat(arrayfun(@(x) x.Mag(:).', originCSI, 'UniformOutput', false));
+    CSI.Phase = cell2mat(arrayfun(@(x) x.Phase(:).', originCSI, 'UniformOutput', false));
+
     
     if isempty(CSI.Mag) || isempty(CSI.Phase)
         CSI.Mag = abs(CSI.CSI);
