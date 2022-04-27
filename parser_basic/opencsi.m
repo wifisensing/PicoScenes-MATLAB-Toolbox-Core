@@ -18,7 +18,9 @@ try
     end
     mergeAcrossCells = true;
 catch
-    warning([fileName extension ' has inconsistent fields. The extracted data returns in the basic cell form.']);
+    warning('off','backtrace');
+    warning(['The bundled parsing stage of [' fileName extension '] fails. The extracted data returns in the basic cell form. See the document <a href = "https://ps.zpj.io/matlab.html#structures-of-the-picoscenes-tx-and-rx-frames">The Raw Parsing & Bundled Parsing</a> for more information.'])
+    warning('on','backtrace');
     bundle = cells;
     mergeAcrossCells = false;
 end
@@ -30,7 +32,9 @@ if ~isempty(bundle) && mergeAcrossCells && exist('RXSBundle','class') && exist('
             bundle = RTRXSBundle(bundle);
         end
     catch
+        warning('off','backtrace');
         warning('failed to convert raw bundles to RXSBundle. The extracted data returns in the merged format.');
+        warning('on','backtrace');
     end
 end
 
