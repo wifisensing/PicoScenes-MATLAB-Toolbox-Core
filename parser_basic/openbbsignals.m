@@ -60,6 +60,15 @@ function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
 
     fseek(fid, skipBytes, 'cof');
     data = fread(fid, readBytes, precision);
+    corruptedLength = rem(numel(data), 2^isComplexMatrix * dimensions(2));
+    data = data(1:numel(data) - corruptedLength);
+
+    if isa(data, 'int16')
+        data = double(data) / 32768;
+    elseif isa(data, 'int8')
+        data = double(data) / 256;
+    end
+
     if isComplexMatrix
         data = reshape(data, 2, []).';
         data = complex(data(:,1), data(:,2));
@@ -68,9 +77,9 @@ function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
         dimensions(1) = numel(data) / prod(dimensions(2:end));
     end
 
-    if majority == SignalStorageMajority.ColumnMajor
+    if majority == SignalStorageMajority.ColumnMajor && dimensions(2) > 1
         data = reshape(data, dimensions);
-    elseif majority == SignalStorageMajority.RowMajor
+    elseif majority == SignalStorageMajority.RowMajor && dimensions(2) > 1
         data = reshape(data, flip(dimensions));
         data = ipermute(data, numel(dimensions):-1:1);
     end
