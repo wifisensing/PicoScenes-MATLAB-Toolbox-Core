@@ -278,6 +278,7 @@ mxArray *convertRxSBasic2MxArray(const RxSBasic &basic) {
     auto *rxsArray = mxCreateStructMatrix(1, 1, 0, NULL);
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "DeviceType"), createScalarMxArray(basic.deviceType));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "Timestamp"), createScalarMxArray(basic.tstamp));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "SystemTime"), createScalarMxArray(basic.systemTime));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "CenterFreq"), createScalarMxArray(basic.centerFreq));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "ControlFreq"), createScalarMxArray(basic.controlFreq));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "CBW"), createScalarMxArray(basic.cbw));

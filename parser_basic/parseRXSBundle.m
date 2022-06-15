@@ -118,6 +118,7 @@ function RxSBasic = combineRxSBasic(originRxSBasic)
     confirmArray = [
                 "DeviceType";
                 "Timestamp";
+                "SystemTime";
                 "CenterFreq";
                 "ControlFreq";
                 "CBW";
