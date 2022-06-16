@@ -14,7 +14,7 @@ This repo depends on the *RXS-Parsing-Core* library wit git submodule mechanism.
 
 ## Remember to delete parser_basic/RXSParser.mexXXXX file everytime after upgrade!!!
 
-    PMT-Core dones't auto-build parser_basic/RXSParser.mexXXXX when the C++ code changes. To make the .mex file sync with the C++ code, delete the .mex file and let PMT-Core to rebuild it.
+    PMT-Core does not auto-build parser_basic/RXSParser.mexXXXX when the C++ code changes. To make the .mex file sync with the C++ code, delete the .mex file and let PMT-Core to rebuild it.
 
 ## Documentation?
 
