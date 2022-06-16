@@ -12,10 +12,14 @@ This repo depends on the *RXS-Parsing-Core* library wit git submodule mechanism.
 
 **Never download! Direct download results in missing the RXS-Parsing-Core library.**
 
-# Documentation?
+## Remember to delete parser_basic/RXSParser.mexXXXX file everytime after upgrade!!!
+
+    PMT-Core dones't auto-build parser_basic/RXSParser.mexXXXX when the C++ code changes. To make the .mex file sync with the C++ code, delete the .mex file and let PMT-Core to rebuild it.
+
+## Documentation?
 
 The document of PMT is at <https://ps.zpj.io/matlab.html>.
 
-# No Issue Tracker for this repo
+## No Issue Tracker for this repo
 
 All PicoScenes related issues should be raised in the dedicated [PicoScenes Issue Tracker](https://gitlab.com/wifisensing/picoscenes-issue-tracker/-/issues).
