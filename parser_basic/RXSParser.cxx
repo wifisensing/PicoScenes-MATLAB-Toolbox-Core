@@ -47,25 +47,25 @@ mxArray *createScalarMxArray(const ValueType &value) {
 template <typename TargetType, typename SourceType>
 mxArray *copyComplexData2MxArray(const std::complex<SourceType> sourceArray[], mwSize numElements, mwSize ndim, const mwSize * dims) {
     mxArray *targetArray = nullptr;
-    if constexpr (std::is_same<SourceType, double>::value) {
+    if constexpr (std::is_same<TargetType, double>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxDOUBLE_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, float>::value) {
+    } else if constexpr (std::is_same<TargetType, float>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxSINGLE_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint64_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT64_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint32_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT32_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint16_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT16_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint8_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT8_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int64_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT64_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int32_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT32_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int16_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT16_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int8_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT8_CLASS, mxCOMPLEX);
     }
 
@@ -85,25 +85,25 @@ mxArray *copyComplexData2MxArray(const std::complex<SourceType> sourceArray[], m
 template <typename TargetType, typename SourceType, bool columnMajor = false>
 mxArray *copyData2MxArray(const SourceType sourceArray[], mwSize numElements, mwSize ndim, const mwSize * dims) {
     mxArray *targetArray = nullptr;
-    if constexpr (std::is_same<SourceType, double>::value) {
+    if constexpr (std::is_same<TargetType, double>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxDOUBLE_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, float>::value) {
+    } else if constexpr (std::is_same<TargetType, float>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxSINGLE_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint64_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT64_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint32_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT32_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint16_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT16_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint8_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxUINT8_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int64_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT64_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int32_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT32_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int16_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT16_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int8_t>::value) {
         targetArray = mxCreateNumericArray(ndim, dims, mxINT8_CLASS, mxREAL);
     }
 
@@ -120,25 +120,25 @@ mxArray *copyData2MxArray(const SourceType sourceArray[], mwSize numElements, mw
 template <typename TargetType, typename SourceType>
 mxArray *copyComplexData2MxArray(const std::complex<SourceType> sourceArray[], uint32_t numElements) {
     mxArray *targetArray = nullptr;
-    if constexpr (std::is_same<SourceType, double>::value) {
+    if constexpr (std::is_same<TargetType, double>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxDOUBLE_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, float>::value) {
+    } else if constexpr (std::is_same<TargetType, float>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxSINGLE_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint64_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxUINT64_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint32_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxUINT32_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint16_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxUINT16_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, uint8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint8_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxUINT8_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int64_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxINT64_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int32_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxINT32_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int16_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxINT16_CLASS, mxCOMPLEX);
-    } else if constexpr (std::is_same<SourceType, int8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int8_t>::value) {
         targetArray = mxCreateNumericMatrix(1, numElements, mxINT8_CLASS, mxCOMPLEX);
     }
 
@@ -158,25 +158,25 @@ mxArray *copyComplexData2MxArray(const std::complex<SourceType> sourceArray[], u
 template <typename TargetType, typename SourceType, bool columnMajor = false>
 mxArray *copyData2MxArray(const SourceType sourceArray[], uint32_t numElements) {
     mxArray *targetArray = nullptr;
-    if constexpr (std::is_same<SourceType, double>::value) {
+    if constexpr (std::is_same<TargetType, double>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxDOUBLE_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, float>::value) {
+    } else if constexpr (std::is_same<TargetType, float>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxSINGLE_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint64_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxUINT64_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint32_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxUINT32_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint16_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxUINT16_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, uint8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, uint8_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxUINT8_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int64_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int64_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxINT64_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int32_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int32_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxINT32_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int16_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int16_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxINT16_CLASS, mxREAL);
-    } else if constexpr (std::is_same<SourceType, int8_t>::value) {
+    } else if constexpr (std::is_same<TargetType, int8_t>::value) {
         targetArray = mxCreateNumericMatrix(columnMajor ? numElements : 1, columnMajor ? 1 : numElements, mxINT8_CLASS, mxREAL);
     }
 
@@ -184,6 +184,7 @@ mxArray *copyData2MxArray(const SourceType sourceArray[], uint32_t numElements) 
     realValue = (TargetType *)mxMalloc(numElements * sizeof(TargetType));
     for (uint32_t index = 0; index < numElements; index++) {
         realValue[index] = static_cast<TargetType>(sourceArray[index]);
+        printf("%u, %f\n", sourceArray[index], realValue[index]);
     }
     mxSetPr(targetArray, (double *)realValue);
 
@@ -472,6 +473,11 @@ mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "FTMClock"), createScalarMxArray<double>(mvmHeader.ftmClock));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "MuClock"), createScalarMxArray<double>(mvmHeader.muClock));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "RateNFlags"), createScalarMxArray(mvmHeader.rate_n_flags));
+    printf("--------------12-------------------\n");
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value12"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved12_52, sizeof(mvmHeader.reserved12_52)));
+    printf("------------end12------------------------\n");
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value56"), createScalarMxArray(mvmHeader.reserved56));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value77"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved77, sizeof(mvmHeader.reserved77)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain0Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain0Info96, sizeof(mvmHeader.chain0Info96)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain1Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain1Info96, sizeof(mvmHeader.chain1Info96)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain2Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain2Info96, sizeof(mvmHeader.chain2Info96)));
