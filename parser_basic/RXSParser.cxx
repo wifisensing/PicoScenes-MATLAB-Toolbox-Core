@@ -184,7 +184,6 @@ mxArray *copyData2MxArray(const SourceType sourceArray[], uint32_t numElements) 
     realValue = (TargetType *)mxMalloc(numElements * sizeof(TargetType));
     for (uint32_t index = 0; index < numElements; index++) {
         realValue[index] = static_cast<TargetType>(sourceArray[index]);
-        printf("%u, %f\n", sourceArray[index], realValue[index]);
     }
     mxSetPr(targetArray, (double *)realValue);
 
@@ -473,9 +472,7 @@ mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "FTMClock"), createScalarMxArray<double>(mvmHeader.ftmClock));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "MuClock"), createScalarMxArray<double>(mvmHeader.muClock));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "RateNFlags"), createScalarMxArray(mvmHeader.rate_n_flags));
-    printf("--------------12-------------------\n");
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value12"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved12_52, sizeof(mvmHeader.reserved12_52)));
-    printf("------------end12------------------------\n");
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value56"), createScalarMxArray(mvmHeader.reserved56));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value77"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved77, sizeof(mvmHeader.reserved77)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain0Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain0Info96, sizeof(mvmHeader.chain0Info96)));
