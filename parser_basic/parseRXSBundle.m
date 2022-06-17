@@ -341,6 +341,9 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
                 "FTMClock";
                 "MuClock";
                 "RateNFlags";
+                "value12";
+                "value56";
+                "value77";
                 "chain0Info96";
                 "chain1Info96";
                 "chain2Info96";
