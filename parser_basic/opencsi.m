@@ -39,6 +39,7 @@ if ~isempty(bundle) && mergeAcrossCells && exist('RXSBundle','class') && exist('
 end
 
 assignin('base', bundleValidName, bundle);
+assignin('base', 'latest', bundle);
 disp(bundleValidName);
 
 if nargout == 0
