@@ -495,6 +495,7 @@ mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value264"), createScalarMxArray(mvmHeader.value264));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value266"), createScalarMxArray(mvmHeader.value266));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value268"), createScalarMxArray(mvmHeader.value268));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value270"), createScalarMxArray(mvmHeader.value270));
 
     return mvmExtraArray;
 }
