@@ -488,6 +488,14 @@ mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo244"), copyData2MxArray<double, uint8_t>(mvmHeader.chainInfo244, sizeof(mvmHeader.chainInfo244)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo248"), copyData2MxArray<double, uint8_t>(mvmHeader.chainInfo248, sizeof(mvmHeader.chainInfo248)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo252"), copyData2MxArray<double, uint8_t>(mvmHeader.chainInfo252, sizeof(mvmHeader.chainInfo252)));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo240_16"), copyData2MxArray<double, uint16_t>(mvmHeader.chainInfo240_16, sizeof(mvmHeader.chainInfo240_16) / sizeof(uint16_t)));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo244_16"), copyData2MxArray<double, uint16_t>(mvmHeader.chainInfo244_16, sizeof(mvmHeader.chainInfo244_16) / sizeof(uint16_t)));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo248_16"), copyData2MxArray<double, uint16_t>(mvmHeader.chainInfo248_16, sizeof(mvmHeader.chainInfo248_16) / sizeof(uint16_t)));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo252_16"), copyData2MxArray<double, uint16_t>(mvmHeader.chainInfo252_16, sizeof(mvmHeader.chainInfo252_16) / sizeof(uint16_t)));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo240_32"), createScalarMxArray(mvmHeader.chainInfo240_32));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo244_32"), createScalarMxArray(mvmHeader.chainInfo244_32));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo248_32"), createScalarMxArray(mvmHeader.chainInfo248_32));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo252_32"), createScalarMxArray(mvmHeader.chainInfo252_32));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value256"), createScalarMxArray(mvmHeader.value256));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value258"), createScalarMxArray(mvmHeader.value258));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value260"), createScalarMxArray(mvmHeader.value260));

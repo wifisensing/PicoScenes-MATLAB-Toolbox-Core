@@ -357,6 +357,14 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
                 "chainInfo244";
                 "chainInfo248";
                 "chainInfo252";
+                "chainInfo240_16";
+                "chainInfo244_16";
+                "chainInfo248_16";
+                "chainInfo252_16";
+                "chainInfo240_32";
+                "chainInfo244_32";
+                "chainInfo248_32";
+                "chainInfo252_32";
                 "value256";
                 "value258";
                 "value260";
@@ -364,6 +372,7 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
                 "value264";
                 "value266";
                 "value268";
+                "value270";
                 ];
 
     for i = 1:size(confirmArray, 1)
