@@ -603,6 +603,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:notBytes", "Input must be a char array");
     }
 
+    CSI::setAutoUnperm(true);
     uint8_T *inBytes = (uint8_T *)mxGetData(prhs[0]);
     auto bufferLength = mxGetNumberOfElements(prhs[0]);
     if (auto frame = ModularPicoScenesRxFrame::fromBuffer(inBytes, bufferLength, true)) {
