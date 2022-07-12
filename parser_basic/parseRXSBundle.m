@@ -339,11 +339,13 @@ end
 function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
     confirmArray = [
                 "FTMClock";
-                "MuClock";
-                "RateNFlags";
                 "value12";
                 "value56";
+                "RSS1";
+                "RSS2";
                 "value77";
+                "MuClock";
+                "RateNFlags";
                 "chain0Info96";
                 "chain1Info96";
                 "chain2Info96";
@@ -359,14 +361,6 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
                 "chainInfo244";
                 "chainInfo248";
                 "chainInfo252";
-                "chainInfo240_16";
-                "chainInfo244_16";
-                "chainInfo248_16";
-                "chainInfo252_16";
-                "chainInfo240_32";
-                "chainInfo244_32";
-                "chainInfo248_32";
-                "chainInfo252_32";
                 "value256";
                 "value258";
                 "value260";
