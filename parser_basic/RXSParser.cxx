@@ -481,6 +481,10 @@ mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain1Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain1Info96, sizeof(mvmHeader.chain1Info96)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain2Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain2Info96, sizeof(mvmHeader.chain2Info96)));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain3Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain3Info96, sizeof(mvmHeader.chain3Info96)));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain0Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain0Info96_32,  sizeof(mvmHeader.chain0Info96_32) /4 ));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain1Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain1Info96_32,  sizeof(mvmHeader.chain1Info96_32) /4 ));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain2Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain2Info96_32,  sizeof(mvmHeader.chain2Info96_32) /4 ));
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain3Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain3Info96_32,  sizeof(mvmHeader.chain3Info96_32) /4 ));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value176"), createScalarMxArray(mvmHeader.value176));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value180"), createScalarMxArray(mvmHeader.value180));
     mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value184"), createScalarMxArray(mvmHeader.value184));

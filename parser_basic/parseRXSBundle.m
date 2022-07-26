@@ -350,6 +350,10 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
                 "chain1Info96";
                 "chain2Info96";
                 "chain3Info96";
+                "chain0Info96_32";
+                "chain1Info96_32";
+                "chain2Info96_32";
+                "chain3Info96_32";
                 "value176";
                 "value180";
                 "value184";
