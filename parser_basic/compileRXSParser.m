@@ -1,7 +1,7 @@
 function compileRXSParser(skipExtraParam)
 
 if nargin == 0
-    skipExtraParam = true;
+    skipExtraParam = false;
 end
 
 disp('Compiling RXSParser.cxx, the MATLAB parser for PicoScenes .csi file ...');

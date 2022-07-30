@@ -1,4 +1,7 @@
 #include "../rxs_parsing_core/ModularPicoScenesFrame.hxx"
+#ifdef CUSTOM_HEADER_MAPPING_EXISTS
+    #include "CustomHeaderMapping.hxx"
+#endif
 
 /**
  * This code performs the following 3 things:
@@ -469,41 +472,28 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
 
 mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader) {
     auto *mvmExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "FTMClock"), createScalarMxArray<double>(mvmHeader.ftmClock));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value12"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved12_52, sizeof(mvmHeader.reserved12_52)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value56"), createScalarMxArray(mvmHeader.reserved56));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "RSS1"), createScalarMxArray(mvmHeader.rssi1));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "RSS2"), createScalarMxArray(mvmHeader.rssi2));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value77"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved77, sizeof(mvmHeader.reserved77)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "MuClock"), createScalarMxArray<double>(mvmHeader.muClock));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "RateNFlags"), createScalarMxArray(mvmHeader.rate_n_flags));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain0Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain0Info96, sizeof(mvmHeader.chain0Info96)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain1Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain1Info96, sizeof(mvmHeader.chain1Info96)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain2Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain2Info96, sizeof(mvmHeader.chain2Info96)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain3Info96"), copyData2MxArray<double, uint8_t>(mvmHeader.chain3Info96, sizeof(mvmHeader.chain3Info96)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain0Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain0Info96_32,  sizeof(mvmHeader.chain0Info96_32) /4 ));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain1Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain1Info96_32,  sizeof(mvmHeader.chain1Info96_32) /4 ));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain2Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain2Info96_32,  sizeof(mvmHeader.chain2Info96_32) /4 ));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chain3Info96_32"), copyData2MxArray<double, int32_t>(mvmHeader.chain3Info96_32,  sizeof(mvmHeader.chain3Info96_32) /4 ));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value176"), createScalarMxArray(mvmHeader.value176));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value180"), createScalarMxArray(mvmHeader.value180));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value184"), createScalarMxArray(mvmHeader.value184));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value188"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved188_198, sizeof(mvmHeader.reserved188_198)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value198"), createScalarMxArray(mvmHeader.value198));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "timeValue200"), createScalarMxArray(mvmHeader.timeValue200));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value208"), copyData2MxArray<double, uint8_t>(mvmHeader.reserved208_240, sizeof(mvmHeader.reserved208_240)));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo240"), createScalarMxArray(mvmHeader.chainInfo240));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo244"), createScalarMxArray(mvmHeader.chainInfo244));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo248"), createScalarMxArray(mvmHeader.chainInfo248));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "chainInfo252"), createScalarMxArray(mvmHeader.chainInfo252));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value256"), createScalarMxArray(mvmHeader.value256));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value258"), createScalarMxArray(mvmHeader.value258));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value260"), createScalarMxArray(mvmHeader.value260));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value262"), createScalarMxArray(mvmHeader.value262));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value264"), createScalarMxArray(mvmHeader.value264));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value266"), createScalarMxArray(mvmHeader.value266));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value268"), createScalarMxArray(mvmHeader.value268));
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "value270"), createScalarMxArray(mvmHeader.value270));
+    for(const auto & field: IntelMVMCSIHeaderDefinition::getCurrentFieldMapping()) {
+        auto fieldName = field.first;
+        auto [fieldType, fieldStart, fieldLength, display] = field.second;
+
+        if (fieldType == "int8" && display) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int8_t>((int8_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int8_t)));
+        } else if (fieldType == "uint8" && display) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint8_t>((uint8_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint8_t)));
+        } else if (fieldType == "int16" && display) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int16_t>((int16_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int16_t)));
+        } else if (fieldType == "uint16" && display) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint16_t>((uint16_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint16_t)));
+        } else if (fieldType == "int32") {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int32_t>((int32_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int32_t)));
+        } else if (fieldType == "uint32") {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint32_t>((uint32_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint32_t)));
+        } else if (fieldType == "int64") {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int64_t>((int64_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int64_t)));
+        } else if (fieldType == "uint64") {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint64_t>((uint64_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint64_t)));
+        }
+    }
 
     return mvmExtraArray;
 }
@@ -607,7 +597,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:notBytes", "Input must be a char array");
     }
 
-    CSI::setAutoUnperm(true);
+#ifdef CUSTOM_HEADER_MAPPING_EXISTS
+    IntelMVMCSIHeaderDefinition::setNewFieldMapping(CustomHeaderMapping::makeMapping());
+#endif
     uint8_T *inBytes = (uint8_T *)mxGetData(prhs[0]);
     auto bufferLength = mxGetNumberOfElements(prhs[0]);
     if (auto frame = ModularPicoScenesRxFrame::fromBuffer(inBytes, bufferLength, true)) {
