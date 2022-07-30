@@ -337,53 +337,17 @@ function extraInfoBundle = combineExtraInfoSlots(ExtraInfos)
 end
 
 function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
-    confirmArray = [
-                "FTMClock";
-                "value12";
-                "value56";
-                "RSS1";
-                "RSS2";
-                "value77";
-                "MuClock";
-                "RateNFlags";
-                "chain0Info96";
-                "chain1Info96";
-                "chain2Info96";
-                "chain3Info96";
-                "chain0Info96_32";
-                "chain1Info96_32";
-                "chain2Info96_32";
-                "chain3Info96_32";
-                "value176";
-                "value180";
-                "value184";
-                "value188";
-                "value198";
-                "timeValue200";
-                "value208";
-                "chainInfo240";
-                "chainInfo244";
-                "chainInfo248";
-                "chainInfo252";
-                "value256";
-                "value258";
-                "value260";
-                "value262";
-                "value264";
-                "value266";
-                "value268";
-                "value270";
-                ];
+    confirmArray = fieldnames(originalNVMExtra);
 
     for i = 1:size(confirmArray, 1)
-        singleField = originalNVMExtra.(confirmArray(i));
+        singleField = originalNVMExtra.(confirmArray{i});
 
         if isscalar(singleField)
-            NVMExtra.(confirmArray(i)) = [originalNVMExtra.(confirmArray(i))].';
+            NVMExtra.(confirmArray{i}) = [originalNVMExtra.(confirmArray{i})].';
         elseif isvector(singleField) && isrow(singleField)
-            NVMExtra.(confirmArray(i)) = cell2mat({originalNVMExtra.(confirmArray(i))}');
+            NVMExtra.(confirmArray{i}) = cell2mat({originalNVMExtra.(confirmArray{i})}');
         elseif isvector(singleField) && iscol(singleField)
-            NVMExtra.(confirmArray(i)) = cell2mat({originalNVMExtra.(confirmArray(i))});
+            NVMExtra.(confirmArray{i}) = cell2mat({originalNVMExtra.(confirmArray{i})});
         end
 
     end
