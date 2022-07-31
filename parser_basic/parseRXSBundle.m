@@ -351,6 +351,10 @@ function NVMExtra = combineMVMExtraSegment(originalNVMExtra)
         end
 
     end
+    
+    if exist('EnhanceMVMExtra', 'file')
+        NVMExtra = EnhanceMVMExtra(NVMExtra);
+    end
 
 end
 
