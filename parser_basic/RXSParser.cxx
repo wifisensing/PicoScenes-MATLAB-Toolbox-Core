@@ -472,7 +472,8 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
 
 mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader) {
     auto *mvmExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    for(const auto & field: IntelMVMCSIHeaderDefinition::getCurrentFieldMapping()) {
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "Raw"), copyData2MxArray<uint8_t, uint8_t>(mvmHeader.headerBytes, sizeof(mvmHeader.headerBytes)));
+    for(const auto & field: IntelMVMCSIHeaderDefinition::getCurrentFields()) {
         auto fieldName = field.first;
         auto [fieldType, fieldStart, fieldLength, display] = field.second;
 
@@ -598,7 +599,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
 
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
-    IntelMVMCSIHeaderDefinition::setNewFieldMapping(CustomHeaderMapping::makeMapping());
+    IntelMVMCSIHeaderDefinition::setNewFieldMapping(CustomHeaderMapping::getFieldList());
 #endif
     uint8_T *inBytes = (uint8_T *)mxGetData(prhs[0]);
     auto bufferLength = mxGetNumberOfElements(prhs[0]);
