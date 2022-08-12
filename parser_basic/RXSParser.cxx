@@ -465,6 +465,15 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
 
         auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi.subcarrierIndices[0], csi.subcarrierIndices.size());
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "SubcarrierIndex"), indexData);
+
+        /*
+        * Phase slope/intercept is an N_{sts} x N_{rx} x N_{CSI} 3-D matrix
+        */
+        auto *phaseSlopeData = copyData2MxArray<double, double>(&csi.phaseSlope.array[0], csi.phaseSlope.array.size(), 3, csiDataDimensions.data() + 1);
+        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "PhaseSlope"), phaseSlopeData);
+
+        auto *phaseInterceptData = copyData2MxArray<double, double>(&csi.phaseIntercept.array[0], csi.phaseIntercept.array.size(), 3, csiDataDimensions.data() + 1);
+        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "PhaseIntercept"), phaseInterceptData);
     }
 
     return groupCell;
