@@ -95,7 +95,7 @@ function [rxs_struct] = CombineRXSStructs (rxs_struct_array)
     end
 
     Channel = mergedCSI;
-    Channel = rmfield(Channel, {'CSI', 'Mag', 'Phase', 'SubcarrierIndex'});
+    Channel = rmfield(Channel, {'CSI', 'Mag', 'Phase', 'SubcarrierIndex', 'PhaseSlope', 'PhaseIntercept'});
 
     rxs_struct.Header = headerCombined;
     rxs_struct.Basic = mergedRxSBasic;
@@ -107,6 +107,8 @@ function [rxs_struct] = CombineRXSStructs (rxs_struct_array)
     rxs_struct.CSI = mergedCSI.CSI;
     rxs_struct.Mag = mergedCSI.Mag;
     rxs_struct.Phase = mergedCSI.Phase;
+    rxs_struct.PhaseSlope = mergedCSI.PhaseSlope;
+    rxs_struct.PhaseIntercept = mergedCSI.PhaseIntercept;
     rxs_struct.SubcarrierIndex = mergedCSI.SubcarrierIndex;
     rxs_struct.Baseband.PilotCSI = PilotCSI;
     rxs_struct.Baseband.LegacyCSI = LegacyCSI;
@@ -173,7 +175,8 @@ function CSI = combineCSI(originCSI)
     CSI.CSI = cell2mat(arrayfun(@(x) x.CSI(:).', originCSI, 'UniformOutput', false));
     CSI.Mag = cell2mat(arrayfun(@(x) x.Mag(:).', originCSI, 'UniformOutput', false));
     CSI.Phase = cell2mat(arrayfun(@(x) x.Phase(:).', originCSI, 'UniformOutput', false));
-
+    CSI.PhaseSlope = cell2mat(arrayfun(@(x) x.PhaseSlope(:).', originCSI, 'UniformOutput', false));
+    CSI.PhaseIntercept = cell2mat(arrayfun(@(x) x.PhaseIntercept(:).', originCSI, 'UniformOutput', false));
     
     if isempty(CSI.Mag) || isempty(CSI.Phase)
         CSI.Mag = abs(CSI.CSI);
