@@ -618,7 +618,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         // printf("rxframe: %s\n", ss.str().c_str());
         mxArray *result;
         if (auto echoProbeReplyIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayload().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.getPayload().payloadDescription == "EchoProbeReplyFull";
+                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyFull";
             });
             echoProbeReplyIt != frame->payloadSegments.cend()) {
             result = mxCreateStructMatrix(2, 1, 0, NULL);
@@ -629,22 +629,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         convertPicoScenesFrame2Struct(*frame, result, 0);
 
         if (auto echoProbeCSIPayloadIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayload().payloadDescription == "EchoProbeReplyCSI";
+                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyCSI";
             });
             echoProbeCSIPayloadIt != frame->payloadSegments.cend()) {
             convertPicoScenesFrame2Struct(*frame, result, 1);  // fake the ack frame for the structual simplicity
-            const auto &csiPayload = echoProbeCSIPayloadIt->getPayload().payloadData;
-            auto txCSISegment = CSISegment::createByBuffer(csiPayload.data(), csiPayload.size());
+            const auto &csiPayload = echoProbeCSIPayloadIt->getPayloadData().payloadData;
+            auto txCSISegment = CSISegment(csiPayload.data(), csiPayload.size());
             txCSISegment.getCSI().removeCSDAndInterpolateCSI();
             auto *rxCSIGroups = convertCSISegment2MxArray(txCSISegment);
             mxSetFieldByNumber(result, 1, mxAddField(result, "CSI"), rxCSIGroups);
         }
 
         if (auto echoProbeFullPacketIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayload().payloadDescription == "EchoProbeReplyFull";
+                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyFull";
             });
             echoProbeFullPacketIt != frame->payloadSegments.cend()) {
-            const auto &rxFrameBuffer = echoProbeFullPacketIt->getPayload().payloadData;
+            const auto &rxFrameBuffer = echoProbeFullPacketIt->getPayloadData().payloadData;
             if (auto initiatingFrame = ModularPicoScenesRxFrame::fromBuffer(rxFrameBuffer.data(), rxFrameBuffer.size(), true)) {
                 convertPicoScenesFrame2Struct(*initiatingFrame, result, 1);
             }
