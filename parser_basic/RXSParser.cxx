@@ -1,4 +1,4 @@
-#include "../rxs_parsing_core/ModularPicoScenesFrame.hxx"
+#include "ModularPicoScenesFrame.hxx"
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
     #include "CustomHeaderMapping.hxx"
 #endif
@@ -479,29 +479,34 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     return groupCell;
 }
 
-mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader) {
+mxArray *convertMVMExtraSegment2MXArray(const MVMExtraSegment& segment) {
+    const auto & parsedHeader = segment.getMvmExtra().parsedHeader;
+    const auto dynamicType = DynamicContentTypeDictionary::getInstance()->queryType(segment.segmentName, segment.segmentVersionId);
     auto *mvmExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "Raw"), copyData2MxArray<uint8_t, uint8_t>(mvmHeader.headerBytes, sizeof(mvmHeader.headerBytes)));
-    for(const auto & field: IntelMVMCSIHeaderDefinition::getCurrentFields()) {
-        auto fieldName = field.first;
-        auto [fieldType, fieldStart, fieldLength, display] = field.second;
+    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "Raw"), copyData2MxArray<uint8_t, uint8_t>(parsedHeader.headerBytes, sizeof(parsedHeader.headerBytes)));
 
-        if (fieldType == "int8" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int8_t>((int8_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int8_t)));
-        } else if (fieldType == "uint8" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint8_t>((uint8_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint8_t)));
-        } else if (fieldType == "int16" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int16_t>((int16_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int16_t)));
-        } else if (fieldType == "uint16" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint16_t>((uint16_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint16_t)));
-        } else if (fieldType == "int32") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int32_t>((int32_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int32_t)));
-        } else if (fieldType == "uint32") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint32_t>((uint32_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint32_t)));
-        } else if (fieldType == "int64") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int64_t>((int64_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int64_t)));
-        } else if (fieldType == "uint64") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint64_t>((uint64_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint64_t)));
+    for(const auto & field: dynamicType->fields) {
+        const auto &fieldName = field.fieldName;
+        const auto &fieldType = field.fieldType;
+        const auto &fieldOffset = field.fieldOffset;
+        const auto &arraySize = field.arraySize;
+
+        if (fieldType == DynamicContentFieldPrimitiveType::Int8) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int8_t>((int8_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint8) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint8_t>((uint8_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Int16) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int16_t>((int16_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint16) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint16_t>((uint16_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Int32) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int32_t>((int32_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint32) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint32_t>((uint32_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Int64) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int64_t>((int64_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint64) {
+            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint64_t>((uint64_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
         }
     }
 
@@ -536,7 +541,7 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxExtraInfo"), rxExtraInfoArray);
 
     if (frame.mvmExtraSegment) {
-        auto *mvmExtraArray = convertMVMExtraSegment2MXArray(frame.mvmExtraSegment->getMvmExtra().parsedHeader);
+        auto *mvmExtraArray = convertMVMExtraSegment2MXArray(*frame.mvmExtraSegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MVMExtra"), mvmExtraArray);
     }
 
@@ -608,7 +613,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
 
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
-    IntelMVMCSIHeaderDefinition::setNewFieldMapping(CustomHeaderMapping::getFieldList());
+    CustomHeaderMapping::registerFullIntelMVMCSIHeaderInterpretation();
+#else
+    DynamicContentTypeDictionary::getInstance()->registerType(IntelMVMParsedCSIHeader::makeDefaultDynamicInterpretation());
 #endif
     uint8_T *inBytes = (uint8_T *)mxGetData(prhs[0]);
     auto bufferLength = mxGetNumberOfElements(prhs[0]);
