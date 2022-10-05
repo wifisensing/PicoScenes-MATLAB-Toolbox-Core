@@ -479,11 +479,9 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     return groupCell;
 }
 
-mxArray *convertMVMExtraSegment2MXArray(const MVMExtraSegment& segment) {
-    const auto & parsedHeader = segment.getMvmExtra().parsedHeader;
-    const auto dynamicType = DynamicContentTypeDictionary::getInstance()->queryType(segment.segmentName, segment.segmentVersionId);
-    auto *mvmExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "Raw"), copyData2MxArray<uint8_t, uint8_t>(parsedHeader.headerBytes, sizeof(parsedHeader.headerBytes)));
+mxArray *convertFrameSegmentViaDynamicInterpretation(const AbstractPicoScenesFrameSegment* segment) {
+    const auto dynamicType = DynamicContentTypeDictionary::getInstance()->queryType(segment->segmentName, segment->segmentVersionId);
+    auto *segmentStruct = mxCreateStructMatrix(1, 1, 0, NULL);
 
     for(const auto & field: dynamicType->fields) {
         const auto &fieldName = field.fieldName;
@@ -492,25 +490,29 @@ mxArray *convertMVMExtraSegment2MXArray(const MVMExtraSegment& segment) {
         const auto &arraySize = field.arraySize;
 
         if (fieldType == DynamicContentFieldPrimitiveType::Int8) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int8_t>((int8_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int8_t>(segment->getDynamicInterpreter().getFieldPointer<int8_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Uint8) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint8_t>((uint8_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint8_t>(segment->getDynamicInterpreter().getFieldPointer<uint8_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Int16) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int16_t>((int16_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int16_t>(segment->getDynamicInterpreter().getFieldPointer<int16_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Uint16) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint16_t>((uint16_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint16_t>(segment->getDynamicInterpreter().getFieldPointer<uint16_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Int32) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int32_t>((int32_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int32_t>(segment->getDynamicInterpreter().getFieldPointer<int32_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Uint32) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint32_t>((uint32_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint32_t>(segment->getDynamicInterpreter().getFieldPointer<uint32_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Int64) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int64_t>((int64_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int64_t>(segment->getDynamicInterpreter().getFieldPointer<int64_t>(fieldName), arraySize));
         } else if (fieldType == DynamicContentFieldPrimitiveType::Uint64) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint64_t>((uint64_t *)&parsedHeader.headerBytes[fieldOffset], arraySize));
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint64_t>(segment->getDynamicInterpreter().getFieldPointer<uint64_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Single) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, float>(segment->getDynamicInterpreter().getFieldPointer<float>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Double) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, double>(segment->getDynamicInterpreter().getFieldPointer<double>(fieldName), arraySize));
         }
     }
 
-    return mvmExtraArray;
+    return segmentStruct;
 }
 
 mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
@@ -541,7 +543,7 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxExtraInfo"), rxExtraInfoArray);
 
     if (frame.mvmExtraSegment) {
-        auto *mvmExtraArray = convertMVMExtraSegment2MXArray(*frame.mvmExtraSegment);
+        auto *mvmExtraArray = convertFrameSegmentViaDynamicInterpretation(&*frame.mvmExtraSegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MVMExtra"), mvmExtraArray);
     }
 
