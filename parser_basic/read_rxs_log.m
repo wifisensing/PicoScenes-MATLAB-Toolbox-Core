@@ -33,6 +33,9 @@ function results = read_rxs_log(filename, maxCSINumber)
         fseek(fp, -4, 'cof');
         bytes=fread(fp, segmentLength,'uint8=>uint8');
         csi_entry = RXSParser(bytes);
+        for i = 1:numel(csi_entry)
+            csi_entry(i).MPDU = {csi_entry(i).MPDU};
+        end
         if isempty(csi_entry) % in very rare case, the data is corrupted.
             continue;
         end
