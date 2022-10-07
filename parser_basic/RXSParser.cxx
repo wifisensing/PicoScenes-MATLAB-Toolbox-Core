@@ -572,15 +572,19 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "TxExtraInfo"), mxCreateStructMatrix(1, 1, 0, NULL));
     }
 
+    auto *txForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
     for(const auto& txSegment: frame.txUnkownSegments) {
         auto *segArray = convertFrameSegmentViaDynamicInterpretation(txSegment);
-        mxSetFieldByNumber(outCell, index, mxAddField(outCell, txSegment.segmentName.c_str()), segArray);
+        mxSetFieldByNumber(txForeignSegments, 0, mxAddField(txForeignSegments, txSegment.segmentName.c_str()), segArray);
     }
+    mxSetFieldByNumber(outCell, index, mxAddField(outCell, "TxForeignSegments"), txForeignSegments);
 
+    auto *rxForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
     for(const auto& rxSegment: frame.rxUnkownSegments) {
         auto *segArray = convertFrameSegmentViaDynamicInterpretation(rxSegment);
-        mxSetFieldByNumber(outCell, index, mxAddField(outCell, rxSegment.segmentName.c_str()), segArray);
+        mxSetFieldByNumber(rxForeignSegments, 0, mxAddField(rxForeignSegments, rxSegment.segmentName.c_str()), segArray);
     }
+    mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxForeignSegments"), rxForeignSegments);
 
     if (frame.pilotCSISegment) {
         if (frame.pilotCSISegment && !frame.pilotCSISegment->getCSI().CSIArray.dimensions.empty() && frame.pilotCSISegment->getCSI().magnitudeArray.dimensions.empty()) {
