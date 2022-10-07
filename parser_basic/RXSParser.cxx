@@ -1,4 +1,4 @@
-#include "../rxs_parsing_core/ModularPicoScenesFrame.hxx"
+#include "ModularPicoScenesFrame.hxx"
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
     #include "CustomHeaderMapping.hxx"
 #endif
@@ -479,33 +479,43 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     return groupCell;
 }
 
-mxArray *convertMVMExtraSegment2MXArray(const IntelMVMParsedCSIHeader &mvmHeader) {
-    auto *mvmExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, "Raw"), copyData2MxArray<uint8_t, uint8_t>(mvmHeader.headerBytes, sizeof(mvmHeader.headerBytes)));
-    for(const auto & field: IntelMVMCSIHeaderDefinition::getCurrentFields()) {
-        auto fieldName = field.first;
-        auto [fieldType, fieldStart, fieldLength, display] = field.second;
+mxArray *convertFrameSegmentViaDynamicInterpretation(const AbstractPicoScenesFrameSegment& segment) {
+    auto *segmentStruct = mxCreateStructMatrix(1, 1, 0, NULL);
+    const auto dynamicType = DynamicContentTypeDictionary::getInstance()->queryType(segment.segmentName, segment.segmentVersionId);
 
-        if (fieldType == "int8" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int8_t>((int8_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int8_t)));
-        } else if (fieldType == "uint8" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint8_t>((uint8_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint8_t)));
-        } else if (fieldType == "int16" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int16_t>((int16_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int16_t)));
-        } else if (fieldType == "uint16" && display) {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint16_t>((uint16_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint16_t)));
-        } else if (fieldType == "int32") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int32_t>((int32_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int32_t)));
-        } else if (fieldType == "uint32") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint32_t>((uint32_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint32_t)));
-        } else if (fieldType == "int64") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, int64_t>((int64_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(int64_t)));
-        } else if (fieldType == "uint64") {
-            mxSetFieldByNumber(mvmExtraArray, 0, mxAddField(mvmExtraArray, fieldName.c_str()), copyData2MxArray<double, uint64_t>((uint64_t *)&mvmHeader.headerBytes[fieldStart], fieldLength / sizeof(uint64_t)));
+    if (!dynamicType)
+        return segmentStruct;
+
+    for(const auto & field: dynamicType->fields) {
+        const auto &fieldName = field.fieldName;
+        const auto &fieldType = field.fieldType;
+        const auto &fieldOffset = field.fieldOffset;
+        const auto &arraySize = field.arraySize;
+
+        if (fieldType == DynamicContentFieldPrimitiveType::Int8) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int8_t>(segment.getDynamicInterpreter().getFieldPointer<int8_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint8) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint8_t>(segment.getDynamicInterpreter().getFieldPointer<uint8_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Int16) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int16_t>(segment.getDynamicInterpreter().getFieldPointer<int16_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint16) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint16_t>(segment.getDynamicInterpreter().getFieldPointer<uint16_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Int32) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int32_t>(segment.getDynamicInterpreter().getFieldPointer<int32_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint32) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint32_t>(segment.getDynamicInterpreter().getFieldPointer<uint32_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Int64) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, int64_t>(segment.getDynamicInterpreter().getFieldPointer<int64_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Uint64) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, uint64_t>(segment.getDynamicInterpreter().getFieldPointer<uint64_t>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Single) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, float>(segment.getDynamicInterpreter().getFieldPointer<float>(fieldName), arraySize));
+        } else if (fieldType == DynamicContentFieldPrimitiveType::Double) {
+            mxSetFieldByNumber(segmentStruct, 0, mxAddField(segmentStruct, fieldName.c_str()), copyData2MxArray<double, double>(segment.getDynamicInterpreter().getFieldPointer<double>(fieldName), arraySize));
         }
     }
 
-    return mvmExtraArray;
+    return segmentStruct;
 }
 
 mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
@@ -536,7 +546,7 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxExtraInfo"), rxExtraInfoArray);
 
     if (frame.mvmExtraSegment) {
-        auto *mvmExtraArray = convertMVMExtraSegment2MXArray(frame.mvmExtraSegment->getMvmExtra().parsedHeader);
+        auto *mvmExtraArray = convertFrameSegmentViaDynamicInterpretation(*frame.mvmExtraSegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MVMExtra"), mvmExtraArray);
     }
 
@@ -561,6 +571,20 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     } else {
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "TxExtraInfo"), mxCreateStructMatrix(1, 1, 0, NULL));
     }
+
+    auto *txForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
+    for(const auto& txSegment: frame.txUnkownSegments) {
+        auto *segArray = convertFrameSegmentViaDynamicInterpretation(txSegment);
+        mxSetFieldByNumber(txForeignSegments, 0, mxAddField(txForeignSegments, txSegment.segmentName.c_str()), segArray);
+    }
+    mxSetFieldByNumber(outCell, index, mxAddField(outCell, "TxForeignSegments"), txForeignSegments);
+
+    auto *rxForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
+    for(const auto& rxSegment: frame.rxUnkownSegments) {
+        auto *segArray = convertFrameSegmentViaDynamicInterpretation(rxSegment);
+        mxSetFieldByNumber(rxForeignSegments, 0, mxAddField(rxForeignSegments, rxSegment.segmentName.c_str()), segArray);
+    }
+    mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxForeignSegments"), rxForeignSegments);
 
     if (frame.pilotCSISegment) {
         if (frame.pilotCSISegment && !frame.pilotCSISegment->getCSI().CSIArray.dimensions.empty() && frame.pilotCSISegment->getCSI().magnitudeArray.dimensions.empty()) {
@@ -607,8 +631,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:notBytes", "Input must be a char array");
     }
 
+    IntelMVMParsedCSIHeader::registerDefaultMVMHeaderInterpretation();
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
-    IntelMVMCSIHeaderDefinition::setNewFieldMapping(CustomHeaderMapping::getFieldList());
+    CustomHeaderMapping::registerPrivateInterpretations();
 #endif
     uint8_T *inBytes = (uint8_T *)mxGetData(prhs[0]);
     auto bufferLength = mxGetNumberOfElements(prhs[0]);
@@ -618,7 +643,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         // printf("rxframe: %s\n", ss.str().c_str());
         mxArray *result;
         if (auto echoProbeReplyIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayload().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.getPayload().payloadDescription == "EchoProbeReplyFull";
+                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyFull";
             });
             echoProbeReplyIt != frame->payloadSegments.cend()) {
             result = mxCreateStructMatrix(2, 1, 0, NULL);
@@ -629,22 +654,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         convertPicoScenesFrame2Struct(*frame, result, 0);
 
         if (auto echoProbeCSIPayloadIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayload().payloadDescription == "EchoProbeReplyCSI";
+                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyCSI";
             });
             echoProbeCSIPayloadIt != frame->payloadSegments.cend()) {
             convertPicoScenesFrame2Struct(*frame, result, 1);  // fake the ack frame for the structual simplicity
-            const auto &csiPayload = echoProbeCSIPayloadIt->getPayload().payloadData;
-            auto txCSISegment = CSISegment::createByBuffer(csiPayload.data(), csiPayload.size());
+            const auto &csiPayload = echoProbeCSIPayloadIt->getPayloadData().payloadData;
+            auto txCSISegment = CSISegment(csiPayload.data(), csiPayload.size());
             txCSISegment.getCSI().removeCSDAndInterpolateCSI();
             auto *rxCSIGroups = convertCSISegment2MxArray(txCSISegment);
             mxSetFieldByNumber(result, 1, mxAddField(result, "CSI"), rxCSIGroups);
         }
 
         if (auto echoProbeFullPacketIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayload().payloadDescription == "EchoProbeReplyFull";
+                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyFull";
             });
             echoProbeFullPacketIt != frame->payloadSegments.cend()) {
-            const auto &rxFrameBuffer = echoProbeFullPacketIt->getPayload().payloadData;
+            const auto &rxFrameBuffer = echoProbeFullPacketIt->getPayloadData().payloadData;
             if (auto initiatingFrame = ModularPicoScenesRxFrame::fromBuffer(rxFrameBuffer.data(), rxFrameBuffer.size(), true)) {
                 convertPicoScenesFrame2Struct(*initiatingFrame, result, 1);
             }
