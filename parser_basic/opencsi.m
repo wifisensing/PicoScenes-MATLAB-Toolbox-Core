@@ -32,15 +32,17 @@ if ~isempty(bundle) && mergeAcrossCells && exist('RXSBundle','class') && exist('
             bundle = RTRXSBundle(bundle);
         end
     catch
-        warning('off','backtrace');
         warning('failed to convert raw bundles to RXSBundle. The extracted data returns in the merged format.');
-        warning('on','backtrace');
     end
 end
 
 assignin('base', bundleValidName, bundle);
 assignin('base', 'latest', bundle);
 disp(bundleValidName);
+
+if exist('RTTProtocolCombiner', 'file')
+    RTTProtocolCombiner(bundleValidName);
+end
 
 if nargout == 0
     bundle = [];
