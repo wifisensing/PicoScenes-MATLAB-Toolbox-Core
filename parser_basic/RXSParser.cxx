@@ -535,6 +535,15 @@ mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
     return dpasRequestArray;
 }
 
+mxArray *convertSDRExtra2MxArray(const SDRExtra &sdrExtra) {
+    auto *sdrExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
+    mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "ScramblerInit"), createScalarMxArray(sdrExtra.scramblerInit));
+    mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "PacketStartInternal"), createScalarMxArray(sdrExtra.packetStartInternal));
+    mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "LastTxTime"), createScalarMxArray(sdrExtra.lastTxTime));
+
+    return sdrExtraArray;
+}
+
 void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *outCell, int index) {
     auto *standardHeaderArray = convertStandardHeader2MxArray(frame.standardHeader);
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "StandardHeader"), standardHeaderArray);
@@ -548,6 +557,11 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     if (frame.mvmExtraSegment) {
         auto *mvmExtraArray = convertFrameSegmentViaDynamicInterpretation(*frame.mvmExtraSegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MVMExtra"), mvmExtraArray);
+    }
+
+    if (frame.sdrExtraSegment) {
+        auto *sdrExtraArray = convertSDRExtra2MxArray(frame.sdrExtraSegment->getSdrExtra());
+        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "SDRExtra"), sdrExtraArray);
     }
 
     if (frame.dpasRequestSegment) {
