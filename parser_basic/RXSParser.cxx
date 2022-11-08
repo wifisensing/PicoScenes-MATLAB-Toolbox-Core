@@ -539,6 +539,7 @@ mxArray *convertSDRExtra2MxArray(const SDRExtra &sdrExtra) {
     auto *sdrExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "ScramblerInit"), createScalarMxArray(sdrExtra.scramblerInit));
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "PacketStartInternal"), createScalarMxArray(sdrExtra.packetStartInternal));
+    mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "PreciseRxTime"), createScalarMxArray(sdrExtra.preciseRxTime));
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "LastTxTime"), createScalarMxArray(sdrExtra.lastTxTime));
 
     return sdrExtraArray;
