@@ -9,12 +9,13 @@ currentDir = pwd;
 
 cd(fileparts(which(mfilename))); % change the MATLAB working directory to the folder of this file.
 cd ../rxs_parsing_core;
+parseDir = pwd;
 direcory = [pwd filesep '*.cxx'];
 allFiles = dir(direcory);
 [cppNum,~] = size(allFiles);
 if cppNum <= 0
     cd (currentDir);
-    error(['There are no files in directory ' pwd ',please go to <a href = "https://gitlab.com/wifisensing/rxs_parsing_core ">https://gitlab.com/wifisensing/rxs_parsing_core </a>to download files']);
+    error(['There are no files in directory ' parseDir ',please go to <a href = "https://gitlab.com/wifisensing/rxs_parsing_core ">https://gitlab.com/wifisensing/rxs_parsing_core </a>to download files']);
 end
 cd(fileparts(which(mfilename))); 
 
