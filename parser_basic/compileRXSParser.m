@@ -13,6 +13,7 @@ direcory = [pwd filesep '*.cxx'];
 allFiles = dir(direcory);
 [cppNum,~] = size(allFiles);
 if cppNum <= 0
+    cd (currentDir);
     error(['There are no files in directory ' pwd ',please go to <a href = "https://gitlab.com/wifisensing/rxs_parsing_core ">https://gitlab.com/wifisensing/rxs_parsing_core </a>to download files']);
 end
 cd(fileparts(which(mfilename))); 
