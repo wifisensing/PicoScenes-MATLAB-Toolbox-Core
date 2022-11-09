@@ -17,6 +17,7 @@ if cppNum <= 0
 end
 cd(fileparts(which(mfilename))); 
 
+extraParam = '';
 if ~skipExtraParam && exist([pwd filesep '..' filesep '..' filesep 'utils'], 'dir')
     extraParam = fileread([pwd filesep '..' filesep '..' filesep 'utils' filesep 'compileRXSParserExtraParam']);
 end
