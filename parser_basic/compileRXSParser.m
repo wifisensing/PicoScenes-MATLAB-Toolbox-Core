@@ -3,9 +3,10 @@ function compileRXSParser(skipExtraParam)
         skipExtraParam = false;
     end
     
-    checkRXSParsingCoreExists;    
-    disp('Compiling RXSParser.cxx, the MATLAB parser for PicoScenes .csi file ...');
     currentDir = pwd;
+    checkRXSParsingCoreExists(currentDir);    
+    disp('Compiling RXSParser.cxx, the MATLAB parser for PicoScenes .csi file ...');
+    
     cd(fileparts(which(mfilename))); 
     
     extraParam = '';
@@ -24,7 +25,7 @@ function compileRXSParser(skipExtraParam)
     cd(currentDir);
 end
 
-function checkRXSParsingCoreExists
+function checkRXSParsingCoreExists(currentDir)
     cd([fileparts(which(mfilename)) filesep '..' filesep 'rxs_parsing_core']);
     parserDir = pwd;
     allFiles = dir([pwd filesep '*.cxx']);
