@@ -194,14 +194,23 @@ mxArray *copyData2MxArray(const SourceType sourceArray[], uint32_t numElements) 
 }
 
 mxArray *convertBasebandSignal2MxArray(const BasebandSignalSegment &bbSegment) {
-    auto bbArray = mxCreateNumericMatrix(bbSegment.getSignalMatrix().dimensions[0], bbSegment.getSignalMatrix().dimensions[1], mxDOUBLE_CLASS, mxCOMPLEX);
-    auto numElements = bbSegment.getSignalMatrix().array.size();
+    auto bbArray = mxCreateNumericMatrix(!bbSegment.getSignalMatrix().empty() ? bbSegment.getSignalMatrix().dimensions[0] : bbSegment.getFloat32SignalMatrix().dimensions[0], !bbSegment.getSignalMatrix().empty() ? bbSegment.getSignalMatrix().dimensions[1] : bbSegment.getFloat32SignalMatrix().dimensions[1], mxDOUBLE_CLASS, mxCOMPLEX);
+
+    auto numElements = !bbSegment.getSignalMatrix().empty() ? bbSegment.getSignalMatrix().array.size() : bbSegment.getFloat32SignalMatrix().array.size();
     auto realValue = (double *)mxMalloc(numElements * sizeof(double));
     auto imagValue = (double *)mxMalloc(numElements * sizeof(double));
-    for (uint32_t index = 0; index < numElements; index++) {
-        realValue[index] = static_cast<double>(bbSegment.getSignalMatrix().array[index].real());
-        imagValue[index] = static_cast<double>(bbSegment.getSignalMatrix().array[index].imag());
+    if (!bbSegment.getSignalMatrix().empty()) {
+        for (uint32_t index = 0; index < numElements; index++) {
+            realValue[index] = static_cast<double>(bbSegment.getSignalMatrix().array[index].real());
+            imagValue[index] = static_cast<double>(bbSegment.getSignalMatrix().array[index].imag());
+        }
+    } else {
+        for (uint32_t index = 0; index < numElements; index++) {
+            realValue[index] = static_cast<double>(bbSegment.getFloat32SignalMatrix().array[index].real());
+            imagValue[index] = static_cast<double>(bbSegment.getFloat32SignalMatrix().array[index].imag());
+        }
     }
+    
     mxSetPr(bbArray, (double *)realValue);
     mxSetPi(bbArray, (double *)imagValue);
 
