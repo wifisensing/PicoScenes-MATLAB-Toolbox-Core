@@ -18,10 +18,10 @@ function [rxsBundles] = parseRXSBundle(rxsBundleFilePathOrRxsCells, maxRxSLogNum
     inner_size = cellfun(@(x) numel(x), rxs_cells);
     outlierIndex = inner_size ~= median(inner_size);
     rxs_cells(outlierIndex) = [];
-    if isfield(rxs_cells, 'BasebandSignals')
-        basebandSignalLengths = cellfun(@(x) numel(x.BasebandSignals) , rxs_cells);
-        outlierIndex = basebandSignalLengths ~= median(basebandSignalLengths);
-    end
+%     if isfield(rxs_cells, 'BasebandSignals')
+%         basebandSignalLengths = cellfun(@(x) numel(x.BasebandSignals) , rxs_cells);
+%         outlierIndex = basebandSignalLengths ~= median(basebandSignalLengths);
+%     end
     rxs_cells(outlierIndex) = [];
     rxs_struct_array = [rxs_cells{:}]';
     rxsBundles = cell(1, size(rxs_struct_array, 2));
