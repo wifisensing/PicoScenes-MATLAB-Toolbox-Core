@@ -527,23 +527,6 @@ mxArray *convertFrameSegmentViaDynamicInterpretation(const AbstractPicoScenesFra
     return segmentStruct;
 }
 
-mxArray *convertDPASRequestSegment2MXArray(const DPASRequest &request) {
-    auto *dpasRequestArray = mxCreateStructMatrix(1, 1, 0, NULL);
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "RequestMode"), createScalarMxArray<double>(request.requestMode));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchId"), createScalarMxArray<double>(request.batchId));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Stage"), createScalarMxArray<double>(request.stage));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "BatchLength"), createScalarMxArray<double>(request.batchLength));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Sequence"),createScalarMxArray<double>(request.sequenceId));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Interval"), createScalarMxArray<double>(request.intervalTime));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "Step"), createScalarMxArray<double>(request.intervalStep));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceType"), createScalarMxArray<double>(uint16_t(request.deviceType)));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "DeviceSubtype"), createScalarMxArray<double>(request.deviceSubtype));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "CarrierFrequency"), createScalarMxArray<double>(request.carrierFrequency));
-    mxSetFieldByNumber(dpasRequestArray, 0, mxAddField(dpasRequestArray, "SamplingRate"), createScalarMxArray<double>(request.samplingFrequency));
-
-    return dpasRequestArray;
-}
-
 mxArray *convertSDRExtra2MxArray(const SDRExtra &sdrExtra) {
     auto *sdrExtraArray = mxCreateStructMatrix(1, 1, 0, NULL);
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "ScramblerInit"), createScalarMxArray(sdrExtra.scramblerInit));
@@ -574,11 +557,6 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "SDRExtra"), sdrExtraArray);
     }
 
-    if (frame.dpasRequestSegment) {
-        auto *dpasRequestArray = convertDPASRequestSegment2MXArray(frame.dpasRequestSegment->getRequest());
-        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "DPASRequest"), dpasRequestArray);
-    }
-
     auto *rxCSIGroups = convertCSISegment2MxArray(frame.csiSegment);
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "CSI"), rxCSIGroups);
 
@@ -597,16 +575,16 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     }
 
     auto *txForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
-    for(const auto& txSegment: frame.txUnkownSegments) {
-        auto *segArray = convertFrameSegmentViaDynamicInterpretation(txSegment);
-        mxSetFieldByNumber(txForeignSegments, 0, mxAddField(txForeignSegments, txSegment.segmentName.c_str()), segArray);
+    for(const auto& txSegment: frame.txUnknownSegments) {
+        auto *segArray = convertFrameSegmentViaDynamicInterpretation(txSegment.second);
+        mxSetFieldByNumber(txForeignSegments, 0, mxAddField(txForeignSegments, txSegment.first.c_str()), segArray);
     }
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "TxForeignSegments"), txForeignSegments);
 
     auto *rxForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
-    for(const auto& rxSegment: frame.rxUnkownSegments) {
-        auto *segArray = convertFrameSegmentViaDynamicInterpretation(rxSegment);
-        mxSetFieldByNumber(rxForeignSegments, 0, mxAddField(rxForeignSegments, rxSegment.segmentName.c_str()), segArray);
+    for(const auto& rxSegment: frame.rxUnknownSegments) {
+        auto *segArray = convertFrameSegmentViaDynamicInterpretation(rxSegment.second);
+        mxSetFieldByNumber(rxForeignSegments, 0, mxAddField(rxForeignSegments, rxSegment.first.c_str()), segArray);
     }
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxForeignSegments"), rxForeignSegments);
 
