@@ -10,13 +10,13 @@ The [RXS-Parsing-Core](https://gitlab.com/wifisensing/rxs_parsing_core) library 
 
 ```git clone https://gitlab.com/wifisensing/PicoScenes-MATLAB-Toolbox-Core --recursive```
 
-## Remember to delete parser_basic/RXSParser.mexXXXX file everytime after upgrade!!!
+## Delete parser_basic/RXSParser.mexXXXX file everytime after upgrade!
 
 PMT-Core does not auto-build parser_basic/RXSParser.mexXXXX when the C++ code changes. To make the .mex file sync with the C++ code, delete the .mex file and let PMT-Core to rebuild it.
 
 ## Documentation?
 
-The document of PMT is at <https://ps.zpj.io/matlab.html>.
+The document of PMT-Core is at <https://ps.zpj.io/matlab.html>.
 
 ## No Issue Tracker for this repo
 
