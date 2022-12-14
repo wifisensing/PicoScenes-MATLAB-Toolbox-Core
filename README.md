@@ -4,13 +4,11 @@
 
 This repo holds the open-sourced part of the larger PicoSenes MATLAB Toolbox (PMT).
 
-## How to obtain? CLONE this repo, RECURSIVELY!
+## How to obtain? No Download! Git clone this repo, RECURSIVELY!
 
-This repo depends on the *RXS-Parsing-Core* library wit git submodule mechanism. You should clone this repo with **--recursive** option like
+The [RXS-Parsing-Core](https://gitlab.com/wifisensing/rxs_parsing_core) library is *submoduled* in this repo. Direct download doesn't download the submodule automatically. The correct way to get the repo is to **git-clone the repo with --recursive option** like
 
 ```git clone https://gitlab.com/wifisensing/PicoScenes-MATLAB-Toolbox-Core --recursive```
-
-**Never download! Direct download results in missing the RXS-Parsing-Core library.**
 
 ## Remember to delete parser_basic/RXSParser.mexXXXX file everytime after upgrade!!!
 
