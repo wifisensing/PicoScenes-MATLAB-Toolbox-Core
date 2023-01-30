@@ -441,49 +441,48 @@ mxArray *convertExtraInfo2MxArray(const ExtraInfo &ei) {
 
 mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     mxArray *groupCell = mxCreateStructMatrix(1, 1, 0, NULL);
-    for (uint32_t csiGroupIndex = 0; csiGroupIndex < 1; csiGroupIndex++) {
-        const auto &csi = csiSegment.getCSI();
+    const auto &csi = csiSegment.getCSI();
 
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "DeviceType"), createScalarMxArray(double(csi.deviceType)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "FirmwareVersion"), createScalarMxArray(double(csi.firmwareVersion)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "PacketFormat"), createScalarMxArray(double(csi.packetFormat)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "CBW"), createScalarMxArray(double(csi.cbw)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "CarrierFreq"), createScalarMxArray(double(csi.carrierFreq)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "SamplingRate"), createScalarMxArray(double(csi.samplingRate)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "SubcarrierBandwidth"), createScalarMxArray(double(csi.subcarrierBandwidth)));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumTones"), createScalarMxArray(csi.dimensions.numTones));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumTx"), createScalarMxArray(csi.dimensions.numTx));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumRx"), createScalarMxArray(csi.dimensions.numRx));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumESS"), createScalarMxArray(csi.dimensions.numESS));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumCSI"), createScalarMxArray(csi.dimensions.numCSI));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "ANTSEL"), createScalarMxArray(csi.antSel));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "DeviceType"), createScalarMxArray(double(csi.deviceType)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "FirmwareVersion"), createScalarMxArray(double(csi.firmwareVersion)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "PacketFormat"), createScalarMxArray(double(csi.packetFormat)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CBW"), createScalarMxArray(double(csi.cbw)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CarrierFreq"), createScalarMxArray(double(csi.carrierFreq)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "SamplingRate"), createScalarMxArray(double(csi.samplingRate)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "SubcarrierBandwidth"), createScalarMxArray(double(csi.subcarrierBandwidth)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "NumTones"), createScalarMxArray(csi.dimensions.numTones));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "NumTx"), createScalarMxArray(csi.dimensions.numTx));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "NumRx"), createScalarMxArray(csi.dimensions.numRx));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "NumESS"), createScalarMxArray(csi.dimensions.numESS));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "NumCSI"), createScalarMxArray(csi.dimensions.numCSI));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "ANTSEL"), createScalarMxArray(csi.antSel));
 
-        std::vector<mwSize> csiDataDimensions {csi.dimensions.numTones, mwSize(csi.dimensions.numTx + csi.dimensions.numESS), csi.dimensions.numRx, csi.dimensions.numCSI};
+    std::vector<mwSize> csiDataDimensions {csi.dimensions.numTones, mwSize(csi.dimensions.numTx + csi.dimensions.numESS), csi.dimensions.numRx, csi.dimensions.numCSI};
+    // printf("%d-%d-%d-%d %d %d %d\n", csiDataDimensions[0], csiDataDimensions[1], csiDataDimensions[2], csiDataDimensions[3], csi.CSIArray.array.size(), csi.phaseArray.array.size(), csi.magnitudeArray.array.size());
 
-        /*
-        * csiData is essentially an N_{sc} x N_{sts} x N_{rx} x N_{CSI} 4-D matrix; The output order is the 1-D reshaped output format, like reshape(csiData, [], 1);
-        */
-        auto *CSIData = copyComplexData2MxArray<double, double>(&csi.CSIArray.array[0], csi.CSIArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "CSI"), CSIData);
+    /*
+    * csiData is essentially an N_{sc} x N_{sts} x N_{rx} x N_{CSI} 4-D matrix; The output order is the 1-D reshaped output format, like reshape(csiData, [], 1);
+    */
+    auto *CSIData = copyComplexData2MxArray<double, double>(&csi.CSIArray.array[0], csi.CSIArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CSI"), CSIData);
 
-        auto *magData = copyData2MxArray<double, double>(&csi.magnitudeArray.array[0], csi.magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "Mag"), magData);
+    auto *magData = copyData2MxArray<double, double>(&csi.magnitudeArray.array[0], csi.magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "Mag"), magData);
 
-        auto *phaseData = copyData2MxArray<double, double>(&csi.phaseArray.array[0], csi.phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "Phase"), phaseData);
+    auto *phaseData = copyData2MxArray<double, double>(&csi.phaseArray.array[0], csi.phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "Phase"), phaseData);
 
-        auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi.subcarrierIndices[0], csi.subcarrierIndices.size());
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "SubcarrierIndex"), indexData);
+    auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi.subcarrierIndices[0], csi.subcarrierIndices.size());
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "SubcarrierIndex"), indexData);
 
-        /*
-        * Phase slope/intercept is an N_{sts} x N_{rx} x N_{CSI} 3-D matrix
-        */
-        auto *phaseSlopeData = copyData2MxArray<double, double>(&csi.phaseSlope.array[0], csi.phaseSlope.array.size(), 3, csiDataDimensions.data() + 1);
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "PhaseSlope"), phaseSlopeData);
+    /*
+    * Phase slope/intercept is an N_{sts} x N_{rx} x N_{CSI} 3-D matrix
+    */
+    auto *phaseSlopeData = copyData2MxArray<double, double>(&csi.phaseSlope.array[0], csi.phaseSlope.array.size(), 3, csiDataDimensions.data() + 1);
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "PhaseSlope"), phaseSlopeData);
 
-        auto *phaseInterceptData = copyData2MxArray<double, double>(&csi.phaseIntercept.array[0], csi.phaseIntercept.array.size(), 3, csiDataDimensions.data() + 1);
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "PhaseIntercept"), phaseInterceptData);
-    }
+    auto *phaseInterceptData = copyData2MxArray<double, double>(&csi.phaseIntercept.array[0], csi.phaseIntercept.array.size(), 3, csiDataDimensions.data() + 1);
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "PhaseIntercept"), phaseInterceptData);
 
     return groupCell;
 }
