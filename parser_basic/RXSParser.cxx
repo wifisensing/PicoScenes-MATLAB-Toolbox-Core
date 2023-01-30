@@ -456,7 +456,7 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumRx"), createScalarMxArray(csi.dimensions.numRx));
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumESS"), createScalarMxArray(csi.dimensions.numESS));
         mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "NumCSI"), createScalarMxArray(csi.dimensions.numCSI));
-        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "ANTSEL"), createScalarMxArray(csi.dimensions.numESS));
+        mxSetFieldByNumber(groupCell, csiGroupIndex, mxAddField(groupCell, "ANTSEL"), createScalarMxArray(csi.antSel));
 
         std::vector<mwSize> csiDataDimensions {csi.dimensions.numTones, mwSize(csi.dimensions.numTx + csi.dimensions.numESS), csi.dimensions.numRx, csi.dimensions.numCSI};
 
