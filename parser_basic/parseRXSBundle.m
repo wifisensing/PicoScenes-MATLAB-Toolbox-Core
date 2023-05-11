@@ -17,7 +17,7 @@ function [rxsBundles] = parseRXSBundle(rxsBundleFilePathOrRxsCells, maxRxSLogNum
 
     rtt_num = cellfun(@(x) numel(x), rxs_cells);
     rtt_outlierIndex = find(rtt_num ~= median(rtt_num));
-    tones_num = cellfun(@(x) double(x.CSI.NumTones) * double(x.CSI.NumTx + x.CSI.NumESS) * double(x.CSI.NumRx) * double(x.CSI.NumCSI), rxs_cells);    
+    tones_num = cellfun(@(x) double(x(1).CSI.NumTones) * double(x(1).CSI.NumTx + x(1).CSI.NumESS) * double(x(1).CSI.NumRx) * double(x(1).CSI.NumCSI), rxs_cells);    
     tones_outlierIndex = find(tones_num ~= median(tones_num));
     outlierIndex = unique([rtt_outlierIndex; tones_outlierIndex]);
     if numel(outlierIndex) < numel(rxs_cells) * 0.05
