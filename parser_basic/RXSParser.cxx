@@ -535,6 +535,7 @@ mxArray *convertSDRExtra2MxArray(const SDRExtra &sdrExtra) {
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "LastTxTime"), createScalarMxArray(sdrExtra.lastTxTime));
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "SignalInputTime"), createScalarMxArray(sdrExtra.signalInputSystemTime));
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "SignalDecodingTime"), createScalarMxArray(sdrExtra.signalDecodeSystemTime));
+    mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "SIGEVM"), createScalarMxArray(sdrExtra.sigEVM));
     mxSetFieldByNumber(sdrExtraArray, 0, mxAddField(sdrExtraArray, "DecodingDelay"), createScalarMxArray(sdrExtra.signalDecodeSystemTime - sdrExtra.signalInputSystemTime));
 
     return sdrExtraArray;
