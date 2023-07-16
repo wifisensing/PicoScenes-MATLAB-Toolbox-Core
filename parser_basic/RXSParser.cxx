@@ -615,7 +615,7 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RawCSI"), rawRxCSIGroup);
     }
 
-        if (frame.rawLegacyCSISegment) {
+    if (frame.rawLegacyCSISegment) {
         auto *rawLegacyRxCSIGroup = convertCSISegment2MxArray(*frame.rawLegacyCSISegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RawLegacyCSI"), rawLegacyRxCSIGroup);
     }
