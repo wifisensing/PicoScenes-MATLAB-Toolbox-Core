@@ -610,6 +610,16 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "LegacyCSI"), legacyRxCSIGroup);
     }
 
+    if (frame.rawCSISegment) {
+        auto *rawRxCSIGroup = convertCSISegment2MxArray(*frame.rawCSISegment);
+        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RawCSI"), rawRxCSIGroup);
+    }
+
+        if (frame.rawLegacyCSISegment) {
+        auto *rawLegacyRxCSIGroup = convertCSISegment2MxArray(*frame.rawLegacyCSISegment);
+        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RawLegacyCSI"), rawLegacyRxCSIGroup);
+    }
+
     if (frame.basebandSignalSegment) {
         auto *basebandSignal = convertBasebandSignal2MxArray(*frame.basebandSignalSegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "BasebandSignals"), basebandSignal);
