@@ -45,11 +45,7 @@ function mergedStruct = structRecursiveMerge(structArray)
 
         try
             if ~isstruct(structArray(1).(nameString))  && ~isscalar(structArray(1).(nameString)) && isnumeric(structArray(1).(nameString))
-                if ~strcmp(fieldName, "PhaseSlope") && ~strcmp(fieldName, "PhaseIntercept")
-                    mergedData = cell2mat(arrayfun(@(x) reshape(x.(nameString), 1, []), reshape(structArray, [], 1), 'UniformOutput', false));
-                else % This is to avoid the crashing bug of MATLAB R2022b
-                    mergedData = [];
-                end
+                mergedData = cell2mat(arrayfun(@(x) reshape(x.(nameString), 1, []), reshape(structArray, [], 1), 'UniformOutput', false));
             else
                 mergedData = [structArray.(nameString)];
             end
