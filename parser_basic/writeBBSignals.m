@@ -4,7 +4,7 @@ function writeBBSignals(signal, bbFileName, storageMajority, precision)
     end
     
     if nargin < 4
-        precision = '';
+        precision = 'int16';
     end
 
     bbFilePath = [bbFileName '.bbsignals'];
@@ -23,7 +23,13 @@ function writeBBSignals(signal, bbFileName, storageMajority, precision)
     end
     
     if ~isempty(precision)
-        signal = cast(signal, precision);
+        if isfloat(signal) && strcmpi('int16', precision)
+            signal = cast(signal * 32768, precision);
+        elseif isfloat(signal) && strcmpi('int8', preendcision)
+            signal = cast(signal * 256, precision);
+        else
+            signal = cast(signal, precision);
+        end
     end
     
     if isa(signal, 'double')
