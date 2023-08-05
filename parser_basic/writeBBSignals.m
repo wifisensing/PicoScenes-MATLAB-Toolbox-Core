@@ -1,6 +1,6 @@
 function writeBBSignals(signal, bbFileName, storageMajority, precision)
     if nargin < 3
-        storageMajority = SignalStorageMajority.ColumnMajor;
+        storageMajority = SignalStorageMajority.RowMajor;
     end
     
     if nargin < 4
