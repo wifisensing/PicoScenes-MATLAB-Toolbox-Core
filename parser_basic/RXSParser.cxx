@@ -454,6 +454,8 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "PacketFormat"), createScalarMxArray(double(csi.packetFormat)));
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CBW"), createScalarMxArray(double(csi.cbw)));
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CarrierFreq"), createScalarMxArray(double(csi.carrierFreq)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CarrierFreq2"), createScalarMxArray(double(csi.carrierFreq2)));
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "IsMerged"), createScalarMxArray(double(csi.isMerged)));
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "SamplingRate"), createScalarMxArray(double(csi.samplingRate)));
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "SubcarrierBandwidth"), createScalarMxArray(double(csi.subcarrierBandwidth)));
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "NumTones"), createScalarMxArray(csi.dimensions.numTones));
