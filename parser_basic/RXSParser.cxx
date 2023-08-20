@@ -292,6 +292,7 @@ mxArray *convertRxSBasic2MxArray(const RxSBasic &basic) {
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "Timestamp"), createScalarMxArray(basic.tstamp));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "SystemTime"), createScalarMxArray(basic.systemTime));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "CenterFreq"), createScalarMxArray(basic.centerFreq));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "CenterFreq2"), createScalarMxArray(basic.centerFreq2));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "ControlFreq"), createScalarMxArray(basic.controlFreq));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "CBW"), createScalarMxArray(basic.cbw));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "PacketFormat"), createScalarMxArray(basic.packetFormat));
@@ -306,6 +307,11 @@ mxArray *convertRxSBasic2MxArray(const RxSBasic &basic) {
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI1"), createScalarMxArray(basic.rssi_ctl0));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI2"), createScalarMxArray(basic.rssi_ctl1));
     mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI3"), createScalarMxArray(basic.rssi_ctl2));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI4"), createScalarMxArray(basic.rssi_ctl3));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI5"), createScalarMxArray(basic.rssi_ctl4));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI6"), createScalarMxArray(basic.rssi_ctl5));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI7"), createScalarMxArray(basic.rssi_ctl6));
+    mxSetFieldByNumber(rxsArray, 0, mxAddField(rxsArray, "RSSI8"), createScalarMxArray(basic.rssi_ctl7));
 
     return rxsArray;
 }
