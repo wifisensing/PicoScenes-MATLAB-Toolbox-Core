@@ -217,25 +217,6 @@ mxArray *convertBasebandSignal2MxArray(const BasebandSignalSegment &bbSegment) {
     return bbArray;
 }
 
-mxArray *convertPreEQSymbols2MxArray(const PreEQSymbolsSegment &preEQSymbolsSegment) {
-    std::vector<mwSize> mwDimensions;
-    for(const auto &dim: preEQSymbolsSegment.getPreEqSymbols().dimensions) {
-        mwDimensions.emplace_back(dim);
-    }
-    auto preEQArray = mxCreateNumericArray(mwDimensions.size(), mwDimensions.data(), mxDOUBLE_CLASS, mxCOMPLEX);
-    auto numElements = preEQSymbolsSegment.getPreEqSymbols().array.size();
-    auto realValue = (double *)mxMalloc(numElements * sizeof(double));
-    auto imagValue = (double *)mxMalloc(numElements * sizeof(double));
-    for (uint32_t index = 0; index < numElements; index++) {
-        realValue[index] = static_cast<double>(preEQSymbolsSegment.getPreEqSymbols().array[index].real());
-        imagValue[index] = static_cast<double>(preEQSymbolsSegment.getPreEqSymbols().array[index].imag());
-    }
-    mxSetPr(preEQArray, (double *)realValue);
-    mxSetPi(preEQArray, (double *)imagValue);
-
-    return preEQArray;
-}
-
 mxArray *convertStandardHeader2MxArray(const ieee80211_mac_frame_header &standardHeader) {
     auto *standardHeaderArray = mxCreateStructMatrix(1, 1, 0, NULL);
 
@@ -610,19 +591,6 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     }
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxForeignSegments"), rxForeignSegments);
 
-    if (frame.pilotCSISegment) {
-        if (frame.pilotCSISegment && !frame.pilotCSISegment->getCSI().CSIArray.dimensions.empty() && frame.pilotCSISegment->getCSI().magnitudeArray.dimensions.empty()) {
-            std::for_each(frame.pilotCSISegment->getCSI().CSIArray.array.cbegin(), frame.pilotCSISegment->getCSI().CSIArray.array.cend(), [&](const std::complex<double> &csi) {
-                frame.pilotCSISegment->getCSI().magnitudeArray.array.emplace_back(std::abs(csi));
-                frame.pilotCSISegment->getCSI().phaseArray.array.emplace_back(std::arg(csi));
-            });
-            frame.pilotCSISegment->getCSI().magnitudeArray.dimensions = frame.pilotCSISegment->getCSI().CSIArray.dimensions;
-            frame.pilotCSISegment->getCSI().phaseArray.dimensions = frame.pilotCSISegment->getCSI().CSIArray.dimensions;
-        }
-        auto *pilotCSICSIGroup = convertCSISegment2MxArray(*frame.pilotCSISegment);
-        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "PilotCSI"), pilotCSICSIGroup);
-    }
-
     if (frame.legacyCSISegment) {
         auto *legacyRxCSIGroup = convertCSISegment2MxArray(*frame.legacyCSISegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "LegacyCSI"), legacyRxCSIGroup);
@@ -641,11 +609,6 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     if (frame.basebandSignalSegment) {
         auto *basebandSignal = convertBasebandSignal2MxArray(*frame.basebandSignalSegment);
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "BasebandSignals"), basebandSignal);
-    }
-
-    if (frame.preEQSymbolsSegment) {
-        auto *preEQSymbols = convertPreEQSymbols2MxArray(*frame.preEQSymbolsSegment);
-        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "PreEQSymbols"), preEQSymbols);
     }
 
     auto *mpduData = copyData2MxArray<uint8_t, uint8_t, true>(frame.mpdu.data(), frame.mpdu.size());
