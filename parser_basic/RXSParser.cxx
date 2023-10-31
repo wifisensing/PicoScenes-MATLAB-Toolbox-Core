@@ -601,8 +601,10 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "BasebandSignals"), basebandSignal);
     }
 
-    auto *mpduData = copyData2MxArray<uint8_t, uint8_t, true>(frame.mpdu.data(), frame.mpdu.size());
-        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MPDU"), mpduData);
+    if (!frame.mpdus.empty()) {
+        auto *mpduData = copyData2MxArray<uint8_t, uint8_t, true>(frame.mpdus[0].data(), frame.mpdus[0].size());
+            mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MPDU"), mpduData);
+    }
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
