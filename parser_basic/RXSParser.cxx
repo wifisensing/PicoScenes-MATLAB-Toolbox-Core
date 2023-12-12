@@ -194,21 +194,15 @@ mxArray *copyData2MxArray(const SourceType sourceArray[], uint32_t numElements) 
 }
 
 mxArray *convertBasebandSignal2MxArray(const BasebandSignalSegment &bbSegment) {
-    auto bbArray = mxCreateNumericMatrix(!bbSegment.getSignalMatrix().empty() ? bbSegment.getSignalMatrix().dimensions[0] : bbSegment.getFloat32SignalMatrix().dimensions[0], !bbSegment.getSignalMatrix().empty() ? bbSegment.getSignalMatrix().dimensions[1] : bbSegment.getFloat32SignalMatrix().dimensions[1], mxDOUBLE_CLASS, mxCOMPLEX);
+    auto bbArray = mxCreateNumericMatrix(bbSegment.getSignals().dimensions[0], bbSegment.getSignals().dimensions[1], mxDOUBLE_CLASS, mxCOMPLEX);
 
-    auto numElements = !bbSegment.getSignalMatrix().empty() ? bbSegment.getSignalMatrix().array.size() : bbSegment.getFloat32SignalMatrix().array.size();
+    auto numElements = bbSegment.getSignals().array.size();
     auto realValue = (double *)mxMalloc(numElements * sizeof(double));
     auto imagValue = (double *)mxMalloc(numElements * sizeof(double));
-    if (!bbSegment.getSignalMatrix().empty()) {
-        for (uint32_t index = 0; index < numElements; index++) {
-            realValue[index] = static_cast<double>(bbSegment.getSignalMatrix().array[index].real());
-            imagValue[index] = static_cast<double>(bbSegment.getSignalMatrix().array[index].imag());
-        }
-    } else {
-        for (uint32_t index = 0; index < numElements; index++) {
-            realValue[index] = static_cast<double>(bbSegment.getFloat32SignalMatrix().array[index].real());
-            imagValue[index] = static_cast<double>(bbSegment.getFloat32SignalMatrix().array[index].imag());
-        }
+
+    for (uint32_t index = 0; index < numElements; index++) {
+        realValue[index] = static_cast<double>(bbSegment.getSignals().array[index].real());
+        imagValue[index] = static_cast<double>(bbSegment.getSignals().array[index].imag());
     }
     
     mxSetPr(bbArray, (double *)realValue);
