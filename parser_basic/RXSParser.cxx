@@ -446,13 +446,13 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     /*
     * csiData is essentially an N_{sc} x N_{sts} x N_{rx} x N_{CSI} 4-D matrix; The output order is the 1-D reshaped output format, like reshape(csiData, [], 1);
     */
-    auto *CSIData = copyComplexData2MxArray<double, double>(&csi.CSIArray.array[0], csi.CSIArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    auto *CSIData = copyComplexData2MxArray<double, float>(&csi.CSIArray.array[0], csi.CSIArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CSI"), CSIData);
 
-    auto *magData = copyData2MxArray<double, double>(&csi.magnitudeArray.array[0], csi.magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    auto *magData = copyData2MxArray<double, float>(&csi.magnitudeArray.array[0], csi.magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "Mag"), magData);
 
-    auto *phaseData = copyData2MxArray<double, double>(&csi.phaseArray.array[0], csi.phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    auto *phaseData = copyData2MxArray<double, float>(&csi.phaseArray.array[0], csi.phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "Phase"), phaseData);
 
     auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi.subcarrierIndices[0], csi.subcarrierIndices.size());
@@ -462,7 +462,7 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     * Phase slope/intercept is an N_{sts} x N_{rx} x N_{CSI} 3-D matrix
     */
    if (!csi.phaseSlope.dimensions.empty()) {
-        auto *phaseSlopeData = copyData2MxArray<double, double>(&csi.phaseSlope.array[0], csi.phaseSlope.array.size(), 3, csiDataDimensions.data() + 1);
+        auto *phaseSlopeData = copyData2MxArray<double, float>(&csi.phaseSlope.array[0], csi.phaseSlope.array.size(), 3, csiDataDimensions.data() + 1);
         mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "PhaseSlope"), phaseSlopeData);
     } else {
         auto * emptyValue = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
@@ -470,7 +470,7 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     }
 
     if (!csi.phaseIntercept.dimensions.empty()) {
-        auto *phaseInterceptData = copyData2MxArray<double, double>(&csi.phaseIntercept.array[0], csi.phaseIntercept.array.size(), 3, csiDataDimensions.data() + 1);
+        auto *phaseInterceptData = copyData2MxArray<double, float>(&csi.phaseIntercept.array[0], csi.phaseIntercept.array.size(), 3, csiDataDimensions.data() + 1);
         mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "PhaseIntercept"), phaseInterceptData);
     } else {
         auto * emptyValue = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
