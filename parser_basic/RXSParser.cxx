@@ -538,10 +538,10 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     auto *standardHeaderArray = convertStandardHeader2MxArray(frame.standardHeader);
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "StandardHeader"), standardHeaderArray);
 
-    auto *basicArray = convertRxSBasic2MxArray(frame.rxSBasicSegment.getBasic());
+    auto *basicArray = convertRxSBasic2MxArray(frame.rxSBasicSegment->getBasic());
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxSBasic"), basicArray);
 
-    auto *rxExtraInfoArray = convertExtraInfo2MxArray(frame.rxExtraInfoSegment.getExtraInfo());
+    auto *rxExtraInfoArray = convertExtraInfo2MxArray(frame.rxExtraInfoSegment->getExtraInfo());
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxExtraInfo"), rxExtraInfoArray);
 
     if (frame.mvmExtraSegment) {
@@ -554,7 +554,7 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
         mxSetFieldByNumber(outCell, index, mxAddField(outCell, "SDRExtra"), sdrExtraArray);
     }
 
-    auto *rxCSIGroups = convertCSISegment2MxArray(frame.csiSegment);
+    auto *rxCSIGroups = convertCSISegment2MxArray(*frame.csiSegment);
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "CSI"), rxCSIGroups);
 
     if (frame.PicoScenesHeader) {
@@ -573,14 +573,14 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
 
     auto *txForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
     for(const auto& txSegment: frame.txUnknownSegments) {
-        auto *segArray = convertFrameSegmentViaDynamicInterpretation(txSegment.second);
+        auto *segArray = convertFrameSegmentViaDynamicInterpretation(*txSegment.second);
         mxSetFieldByNumber(txForeignSegments, 0, mxAddField(txForeignSegments, txSegment.first.c_str()), segArray);
     }
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "TxForeignSegments"), txForeignSegments);
 
     auto *rxForeignSegments = mxCreateStructMatrix(1, 1, 0, NULL);
     for(const auto& rxSegment: frame.rxUnknownSegments) {
-        auto *segArray = convertFrameSegmentViaDynamicInterpretation(rxSegment.second);
+        auto *segArray = convertFrameSegmentViaDynamicInterpretation(*rxSegment.second);
         mxSetFieldByNumber(rxForeignSegments, 0, mxAddField(rxForeignSegments, rxSegment.first.c_str()), segArray);
     }
     mxSetFieldByNumber(outCell, index, mxAddField(outCell, "RxForeignSegments"), rxForeignSegments);
@@ -625,8 +625,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         // ss << *frame;
         // printf("rxframe: %s\n", ss.str().c_str());
         mxArray *result;
-        if (auto echoProbeReplyIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyFull";
+        if (auto echoProbeReplyIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const std::shared_ptr<PayloadSegment> &payloadSegment) {
+                return payloadSegment.get()->getPayloadData().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.get()->getPayloadData().payloadDescription == "EchoProbeReplyFull";
             });
             echoProbeReplyIt != frame->payloadSegments.cend()) {
             result = mxCreateStructMatrix(2, 1, 0, NULL);
@@ -636,23 +636,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
         convertPicoScenesFrame2Struct(*frame, result, 0);
 
-        if (auto echoProbeCSIPayloadIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyCSI";
+        if (auto echoProbeCSIPayloadIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const std::shared_ptr<PayloadSegment> &payloadSegment) {
+                return payloadSegment.get()->getPayloadData().payloadDescription == "EchoProbeReplyCSI";
             });
             echoProbeCSIPayloadIt != frame->payloadSegments.cend()) {
             convertPicoScenesFrame2Struct(*frame, result, 1);  // fake the ack frame for the structual simplicity
-            const auto &csiPayload = echoProbeCSIPayloadIt->getPayloadData().payloadData;
+            const auto &csiPayload = echoProbeCSIPayloadIt->get()->getPayloadData().payloadData;
             auto txCSISegment = CSISegment(csiPayload.data(), csiPayload.size());
             txCSISegment.getCSI().removeCSDAndInterpolateCSI();
             auto *rxCSIGroups = convertCSISegment2MxArray(txCSISegment);
             mxSetFieldByNumber(result, 1, mxAddField(result, "CSI"), rxCSIGroups);
         }
 
-        if (auto echoProbeFullPacketIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const PayloadSegment &payloadSegment) {
-                return payloadSegment.getPayloadData().payloadDescription == "EchoProbeReplyFull";
+        if (auto echoProbeFullPacketIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const std::shared_ptr<PayloadSegment> &payloadSegment) {
+                return payloadSegment.get()->getPayloadData().payloadDescription == "EchoProbeReplyFull";
             });
             echoProbeFullPacketIt != frame->payloadSegments.cend()) {
-            const auto &rxFrameBuffer = echoProbeFullPacketIt->getPayloadData().payloadData;
+            const auto &rxFrameBuffer = echoProbeFullPacketIt->get()->getPayloadData().payloadData;
             if (auto initiatingFrame = ModularPicoScenesRxFrame::fromBuffer(rxFrameBuffer.data(), rxFrameBuffer.size(), true)) {
                 convertPicoScenesFrame2Struct(*initiatingFrame, result, 1);
             }
