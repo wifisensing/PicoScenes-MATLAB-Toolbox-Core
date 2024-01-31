@@ -598,6 +598,8 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
     if (!frame.mpdus.empty()) {
         auto *mpduData = copyData2MxArray<uint8_t, uint8_t, true>(frame.mpdus[0].data(), frame.mpdus[0].size());
             mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MPDU"), mpduData);
+    } else {
+        mxSetFieldByNumber(outCell, index, mxAddField(outCell, "MPDU"), copyData2MxArray<uint8_t, uint8_t, true>(nullptr, 0));
     }
 }
 
