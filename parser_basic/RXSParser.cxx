@@ -458,6 +458,9 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi->subcarrierIndices[0], csi->subcarrierIndices.size());
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "SubcarrierIndex"), indexData);
 
+    auto *timingOffsetData = copyData2MxArray<uint32_t, uint32_t>(csi->timingOffsets.data(), csi->timingOffsets.size());
+    mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "TimingOffsets"), timingOffsetData);
+
     /*
     * Phase slope/intercept is an N_{sts} x N_{rx} x N_{CSI} 3-D matrix
     */
