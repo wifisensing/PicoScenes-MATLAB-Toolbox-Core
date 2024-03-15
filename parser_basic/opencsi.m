@@ -8,7 +8,7 @@ disp(['Start parsing PicoScenes CSI file: ' fileName extension]);
 cells = read_rxs_log(filePath);
 try
     bundle = parseRXSBundle(cells);
-    if numel(bundle) == 1
+    if isscalar(bundle)
         bundle{1}.BundleName = bundleValidName;
     else
         if numel(bundle) == 2

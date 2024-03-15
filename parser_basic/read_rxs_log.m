@@ -40,6 +40,10 @@ function results = read_rxs_log(filename, maxCSINumber)
             continue;
         end
         
+        if ParserPreference.getPreference.skipBasebandSignals
+            csi_entry = rmfield(csi_entry, 'BasebandSignals');
+        end
+
         if count == numel(results)
             results = [results; cell(resultBatchSize, 1)];
         end
