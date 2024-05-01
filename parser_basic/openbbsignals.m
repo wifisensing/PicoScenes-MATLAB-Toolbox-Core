@@ -73,7 +73,7 @@ function data = loadBasebandSignalFile(bbFilePath, skipLines, totalLines2Read)
     precision = [precision '=>double'];
 
     if isComplexMatrix
-        data = coder.nullcopy(complex(zeros(totalLines2Read, 1)));
+        data = coder.nullcopy(zeros(totalLines2Read, 1, 'like', complex(0)));
     else
         data = coder.nullcopy(zeros(totalLines2Read, 1));
     end
