@@ -1,26 +1,33 @@
 function openbbsignals(filePath, varargin)
 
 if isempty(varargin)
-    skipLength = 0;
-    readLength = inf;
+    lines2Skip = 0;
+    lines2Read = inf;
 else
-    skipLength = varargin{1};
-    readLength = varargin{2};
+    lines2Skip = varargin{1};
+    lines2Read = varargin{2};
 end
 
-[~,fileName,extension] = fileparts(filePath);
+[~,fileName] = fileparts(filePath);
 validName = matlab.lang.makeValidName(fileName);
-disp(['Loading PicoScenes SDR baseband signal file: ' fileName extension]);
-bb_signal = loadBasebandSignalFile(filePath, skipLength, readLength);
+bb_signal = loadBasebandSignalFile(filePath, lines2Skip, lines2Read);
 assignin('base', validName, bb_signal);
 disp(['Loaded variable name: ' validName]);
 
 end
 
-function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
+function data = loadBasebandSignalFile(bbFilePath, skipLines, totalLines2Read)
     fid = fopen(bbFilePath);
+    fseek(fid, 0, 'eof');
+    fileSize = ftell(fid);
+    fseek(fid, 0, 'bof');
+
     fileHeader = fread(fid, 2, 'char=>char');
     bbFileVersion = fread(fid, 2, 'char=>char');
+    if any(fileHeader' ~= 'BB') || (any(bbFileVersion' ~= 'v1') && any(bbFileVersion' ~= 'v2'))
+        error(' ** incompatible .bbsignals file format! **');
+    end
+
     numDimensions = fread(fid, 1, 'uint8=>double');
     dimensions = ones(1, numDimensions);
     if bbFileVersion(2) - 48 == 1
@@ -36,11 +43,21 @@ function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
     typeChar = fread(fid, 1, 'char=>double');
     typeBits = fread(fid, 1, 'uint8=>double');
     majority = SignalStorageMajority(fread(fid, 1, 'uint8=>double'));
+    currentPos = ftell(fid);
 
-    if any(fileHeader' ~= 'BB') || (any(bbFileVersion' ~= 'v1') && any(bbFileVersion' ~= 'v2'))
-        error(' ** incompatible .bbsignals file format! **');
+    disp(['BBSignals: [' bbFilePath ']']);
+    disp(['Signature: [bbVer=' bbFileVersion' ', complex=' num2str(isComplexMatrix) ', type=' char(typeChar) num2str(typeBits) ', major=' char(majority) ']']);
+    rowBytes = (typeBits / 8) * 2^isComplexMatrix * prod(dimensions(2:end));
+    rowsInFile = floor((fileSize - currentPos) / rowBytes);
+    dimensions(1) = rowsInFile;
+    disp(['Size: numDim=' num2str(numDimensions) ', dims=[' num2str(dimensions) '], fileSize=' num2str(fileSize/1e6) 'MB'])
+
+    if isinf(totalLines2Read)
+        totalLines2Read = rowsInFile - skipLines;
     end
-    
+    skipBytes = skipLines * rowBytes;
+    fseek(fid, skipBytes, 'cof');
+
     if typeChar == 'D'
         precision = 'float';
     elseif typeChar == 'F'
@@ -53,29 +70,39 @@ function data = loadBasebandSignalFile(bbFilePath,skipLength, readLength)
         precision = 'uint';
     end
     precision = [precision num2str(typeBits)];
-    precision = [precision '=>' precision];
-
-    skipBytes = typeBits * skipLength / 8 * 2^isComplexMatrix * dimensions(2);
-    readBytes = readLength * 2^isComplexMatrix * dimensions(2);
-
-    fseek(fid, skipBytes, 'cof');
-    data = fread(fid, readBytes, precision);
-    corruptedLength = rem(numel(data), 2^isComplexMatrix * dimensions(2));
-    data = data(1:numel(data) - corruptedLength);
-
-    if isa(data, 'int16')
-        data = double(data) / 32768;
-    elseif isa(data, 'int8')
-        data = double(data) / 256;
-    end
+    precision = [precision '=>double'];
 
     if isComplexMatrix
-        data = reshape(data, 2, []).';
-        data = complex(data(:,1), data(:,2));
+        data = coder.nullcopy(complex(zeros(totalLines2Read, 1)));
+    else
+        data = coder.nullcopy(zeros(totalLines2Read, 1));
     end
-    if dimensions(1) < 0 % streaming file
-        dimensions(1) = numel(data) / prod(dimensions(2:end));
+
+    readLines = 0;
+    stepLimit = 1e8;
+    while readLines < totalLines2Read
+        if readLines + stepLimit < totalLines2Read
+            step = stepLimit;
+        else
+            step = totalLines2Read - readLines;
+        end
+        stepBytes2Read = step * 2^isComplexMatrix * prod(dimensions(2:end));
+        temp = fread(fid, stepBytes2Read, precision);
+        
+        if typeChar == 'I' && typeBits == 16
+            temp = temp / 32768;
+        elseif typeChar == 'I' && typeBits == 8
+            temp = temp / 256;
+        end
+    
+        if isComplexMatrix
+            temp = complex(temp(1:2:end), temp(2:2:end)); % slower but save memory
+        end
+
+        data(readLines + 1 : readLines + step) = temp;
+        readLines = readLines + step;
     end
+    
 
     if majority == SignalStorageMajority.ColumnMajor && dimensions(2) > 1
         data = reshape(data, dimensions);
