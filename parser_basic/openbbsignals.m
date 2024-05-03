@@ -1,22 +1,25 @@
 function openbbsignals(filePath, varargin)
 
 if isempty(varargin)
-    lines2Skip = 0;
-    lines2Read = inf;
+    skipRatio = 0;
+    readRatio = 1;
 else
-    lines2Skip = varargin{1};
-    lines2Read = varargin{2};
+    skipRatio = varargin{1};
+
+    if isscalar(varargin)
+        readRatio = 1 - varargin{1};
+    end
 end
 
 [~,fileName] = fileparts(filePath);
 validName = matlab.lang.makeValidName(fileName);
-bb_signal = loadBasebandSignalFile(filePath, lines2Skip, lines2Read);
+bb_signal = loadBasebandSignalFile(filePath, skipRatio, readRatio);
 assignin('base', validName, bb_signal);
 disp(['Loaded variable name: ' validName]);
 
 end
 
-function data = loadBasebandSignalFile(bbFilePath, skipLines, totalLines2Read)
+function data = loadBasebandSignalFile(bbFilePath, skipRatio, readRatio)
     fid = fopen(bbFilePath);
     fseek(fid, 0, 'eof');
     fileSize = ftell(fid);
@@ -52,9 +55,11 @@ function data = loadBasebandSignalFile(bbFilePath, skipLines, totalLines2Read)
     dimensions(1) = rowsInFile;
     disp(['Size: numDim=' num2str(numDimensions) ', dims=[' num2str(dimensions) '], fileSize=' num2str(fileSize/1e6) 'MB'])
 
-    if isinf(totalLines2Read)
-        totalLines2Read = rowsInFile - skipLines;
+    if readRatio >= 1 || skipRatio + readRatio > 1
+        readRatio = 1 - skipRatio;
     end
+    totalLines2Read = floor(readRatio * dimensions(1));
+    skipLines = floor(skipRatio * dimensions(1));
     skipBytes = skipLines * rowBytes;
     fseek(fid, skipBytes, 'cof');
 
