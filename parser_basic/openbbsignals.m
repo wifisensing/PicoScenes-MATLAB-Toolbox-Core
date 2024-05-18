@@ -6,14 +6,13 @@ function openbbsignals(filePath, varargin)
     else
         startRatio = varargin{1};
     
-        if isscalar(varargin)
-            endRatio = 1;
-        else
-            endRatio = varargin(2);
+        if numel(varargin) >=2
+            endRatio = varargin{2};
         end
         
     end
 
+    % Invoke BBSignalsFileLoader if exists, or load the data directly.
     if exist('BBSignalsFileLoader', 'file')
         BBSignalsFileLoader(filePath);
     else
