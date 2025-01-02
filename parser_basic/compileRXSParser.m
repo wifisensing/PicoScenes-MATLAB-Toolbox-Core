@@ -31,6 +31,6 @@ function checkRXSParsingCoreExists(currentDir)
     allFiles = dir([pwd filesep '*.cxx']);
     if isempty(allFiles)
         cd (currentDir);
-        error(['The [' parserDir '] directory is empty! That means you have NOT cloned the PicoScenes MATALB Toolbox RECURSIVELY. Please refer to page <a href = "https://gitlab.com/wifisensing/PicoScenes-MATLAB-Toolbox-Core">PicoScenes MATLAB Toolbox Core</a> on how to clone the toolbox correctly.']);
+        error(['The [' parserDir '] directory is empty! That means you have NOT cloned the PicoScenes MATALB Toolbox RECURSIVELY. Please refer to page <a href = "https://github.com/wifisensing/PicoScenes-MATLAB-Toolbox-Core">PicoScenes MATLAB Toolbox Core</a> on how to clone the toolbox correctly.']);
     end
 end
