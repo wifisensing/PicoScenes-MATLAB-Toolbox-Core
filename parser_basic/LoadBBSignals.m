@@ -84,11 +84,11 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
         stepBytes2Read = step * 2^isComplexMatrix * prod(dimensions(2:end));
         temp = fread(fid, stepBytes2Read, precision);
         
-        if typeChar == 'I' && typeBits == 16
-            temp = temp / 32768;
-        elseif typeChar == 'I' && typeBits == 8
-            temp = temp / 256;
-        end
+        % if typeChar == 'I' && typeBits == 16
+        %     temp = temp / 32768;
+        % elseif typeChar == 'I' && typeBits == 8
+        %     temp = temp / 256;
+        % end
     
         if isComplexMatrix
             temp = complex(temp(1:2:end), temp(2:2:end)); % slower but save memory
