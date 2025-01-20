@@ -46,7 +46,6 @@ matlab::data::TypedArray<TargetType> copyData2MxArray(const SourceType sourceArr
 
     std::vector<size_t> dimensions(dims, dims + ndim);
     auto targetArray = factory.createArray<TargetType>(dimensions);
-
     std::copy(sourceArray, sourceArray + numElements, targetArray.begin());
 
     return targetArray;
@@ -82,7 +81,6 @@ matlab::data::TypedArray<TargetType> copyData2MxArray(const SourceType sourceArr
 
 matlab::data::TypedArray<std::complex<double>> convertBasebandSignal2MxArray(const BasebandSignalSegment &bbSegment) {
     using namespace matlab::data;
-
     ArrayFactory factory;
 
     auto bbArray = factory.createArray<std::complex<double>>({static_cast<std::size_t>(bbSegment.getSignals().dimensions[0]), static_cast<std::size_t>(bbSegment.getSignals().dimensions[1])});
@@ -141,18 +139,20 @@ matlab::data::StructArray convertPicoScenesHeader2MxArray(const PicoScenesFrameH
     return picoScenesFrameHeaderArray;
 }
 
-matlab::data::StructArray convertRxSBasic2MxArray(const RxSBasic &basic) {
+matlab::data::StructArray convertRxSBasic2MxArray(const RxSBasicSegment &basicSegment) {
     using namespace matlab::data;
     ArrayFactory factory;
 
-    StructArray rxsArray = factory.createStructArray({1, 1}, {
-        "DeviceType", "Timestamp", "SystemTime", "CenterFreq", "CenterFreq2", "ControlFreq", 
-        "CBW", "PacketFormat", "PacketCBW", "GI", "MCS", "NumSTS", 
+    const auto& basic = basicSegment.getBasic();
+    StructArray rxsArray = factory.createStructArray({1, 1}, { 
+        "SegmentVersion", "DeviceType", "Timestamp", "SystemTime", "CenterFreq", "CenterFreq2", 
+        "ControlFreq", "CBW", "PacketFormat", "PacketCBW", "GI", "MCS", "NumSTS", 
         "NumESS", "NumRx", "NoiseFloor", "RSSI", 
         "RSSI1", "RSSI2", "RSSI3", "RSSI4", 
         "RSSI5", "RSSI6", "RSSI7", "RSSI8"
     });
 
+    rxsArray[0]["SegmentVersion"] = createScalarMxArray(basicSegment.segmentVersionId);    
     rxsArray[0]["DeviceType"] = createScalarMxArray(basic.deviceType);
     rxsArray[0]["Timestamp"] = createScalarMxArray(basic.tstamp);
     rxsArray[0]["SystemTime"] = createScalarMxArray(basic.systemTime);
@@ -182,11 +182,14 @@ matlab::data::StructArray convertRxSBasic2MxArray(const RxSBasic &basic) {
 }
 
 
-matlab::data::StructArray convertExtraInfo2MxArray(const ExtraInfo &ei) {
+matlab::data::StructArray convertExtraInfo2MxArray(const ExtraInfoSegment &eiSegment) {
     using namespace matlab::data;
     ArrayFactory factory;
 
+    const ExtraInfo& ei = eiSegment.getExtraInfo();
     std::vector<std::pair<std::string, matlab::data::Array>> fields;
+    fields.emplace_back("SegmentVersion", factory.createScalar(eiSegment.segmentVersionId));
+    fields.emplace_back("FeatureCode", factory.createScalar(ei.featureCode));
     fields.emplace_back("HasLength", factory.createScalar(ei.hasLength));
     fields.emplace_back("HasVersion", factory.createScalar(ei.hasVersion));
     fields.emplace_back("HasMacAddr_cur", factory.createScalar(ei.hasMacAddr_cur));
@@ -197,7 +200,9 @@ matlab::data::StructArray convertExtraInfo2MxArray(const ExtraInfo &ei) {
     fields.emplace_back("HasTxChainMask", factory.createScalar(ei.hasTxChainMask));
     fields.emplace_back("HasRxChainMask", factory.createScalar(ei.hasRxChainMask));
     fields.emplace_back("HasTxpower", factory.createScalar(ei.hasTxpower));
+    fields.emplace_back("HasCF", factory.createScalar(ei.hasCF));
     fields.emplace_back("HasCFO", factory.createScalar(ei.hasCFO));
+    fields.emplace_back("HasSFO", factory.createScalar(ei.hasSFO));
     fields.emplace_back("HasTxTSF", factory.createScalar(ei.hasTxTSF));
     fields.emplace_back("HasLastHwTxTSF", factory.createScalar(ei.hasLastHWTxTSF));
     fields.emplace_back("HasChannelFlags", factory.createScalar(ei.hasChannelFlags));
@@ -218,11 +223,11 @@ matlab::data::StructArray convertExtraInfo2MxArray(const ExtraInfo &ei) {
         fields.emplace_back("Version", factory.createScalar(ei.version));
     }
     if (ei.hasMacAddr_cur) {
-        TypedArray<uint8_t> macaddr_cur = factory.createArray<uint8_t>({1, 3}, ei.macaddr_cur, ei.macaddr_cur + 3);
+        TypedArray<uint8_t> macaddr_cur = factory.createArray<uint8_t>({1, 6}, ei.macaddr_cur, ei.macaddr_cur + 6);
         fields.emplace_back("MACAddressCurrent", macaddr_cur);
     }
     if (ei.hasMacAddr_rom) {
-        TypedArray<uint8_t> macaddr_rom = factory.createArray<uint8_t>({1, 3}, ei.macaddr_rom, ei.macaddr_rom + 3);
+        TypedArray<uint8_t> macaddr_rom = factory.createArray<uint8_t>({1, 6}, ei.macaddr_rom, ei.macaddr_rom + 6);
         fields.emplace_back("MACAddressROM", macaddr_rom);
     }
     if (ei.hasChansel) {
@@ -232,7 +237,7 @@ matlab::data::StructArray convertExtraInfo2MxArray(const ExtraInfo &ei) {
         fields.emplace_back("BMode", factory.createScalar(ei.bmode));
     }
     if (ei.hasEVM) {
-        TypedArray<int8_t> evmMxArray = factory.createArray<int8_t>({1, 18}, ei.evm, ei.evm + 18);
+        TypedArray<int8_t> evmMxArray = factory.createArray<int8_t>({1, 20}, ei.evm, ei.evm + 20);
         fields.emplace_back("EVM", evmMxArray);
     }
     if (ei.hasTxChainMask) {
@@ -309,7 +314,7 @@ matlab::data::StructArray convertCSISegment2MxArray(const CSISegment &csiSegment
     ArrayFactory factory;
 
     StructArray groupCell = factory.createStructArray({1, 1}, {
-        "DeviceType", "FirmwareVersion", "PacketFormat", "CBW", 
+        "SegmentVersion", "DeviceType", "FirmwareVersion", "PacketFormat", "CBW", 
         "CarrierFreq", "CarrierFreq2", "IsMerged", "SamplingRate", 
         "SubcarrierBandwidth", "NumTones", "NumTx", "NumRx", 
         "NumESS", "NumCSI", "ANTSEL", "CSI", 
@@ -319,6 +324,7 @@ matlab::data::StructArray convertCSISegment2MxArray(const CSISegment &csiSegment
 
     const auto &csi = csiSegment.getCSI();
     
+    groupCell[0]["SegmentVersion"] = createScalarMxArray(static_cast<double>(csiSegment.segmentVersionId));
     groupCell[0]["DeviceType"] = createScalarMxArray(static_cast<double>(csi->deviceType));
     groupCell[0]["FirmwareVersion"] = createScalarMxArray(static_cast<double>(csi->firmwareVersion));
     groupCell[0]["PacketFormat"] = createScalarMxArray(static_cast<double>(csi->packetFormat));
@@ -384,7 +390,7 @@ matlab::data::StructArray convertFrameSegmentViaDynamicInterpretation(const Abst
     std::vector<std::string> fieldNames;
     for (const auto &field : dynamicType->fields) {
         fieldNames.push_back(field.fieldName);
-    }
+    }   
 
     StructArray segmentStruct = factory.createStructArray({1, 1}, fieldNames);
 
@@ -442,17 +448,19 @@ matlab::data::StructArray convertFrameSegmentViaDynamicInterpretation(const Abst
     return segmentStruct;
 }
 
-matlab::data::StructArray convertSDRExtra2MxArray(const SDRExtra &sdrExtra) {
+matlab::data::StructArray convertSDRExtra2MxArray(const SDRExtraSegment &sdrExtraSegment) {
     using namespace matlab::data;
     ArrayFactory factory;
 
     StructArray sdrExtraArray = factory.createStructArray({1, 1}, {
-        "ScramblerInit", "PacketStartInternal", "PreciseRxSampleIndex", 
+        "SegmentVersion", "ScramblerInit", "PacketStartInternal", "PreciseRxSampleIndex", 
         "PreciseRxTime", "LastTxTime", "SignalInputTime", 
         "SignalDecodingTime", "SIGEVM", "InitialCFO", 
         "ResidualCFO", "DecodingDelay"
     });
 
+    const SDRExtra& sdrExtra = sdrExtraSegment.getSdrExtra();
+    sdrExtraArray[0]["SegmentVersion"] = createScalarMxArray(sdrExtraSegment.segmentVersionId);
     sdrExtraArray[0]["ScramblerInit"] = createScalarMxArray(sdrExtra.scramblerInit);
     sdrExtraArray[0]["PacketStartInternal"] = createScalarMxArray(sdrExtra.packetStartInternal);
     sdrExtraArray[0]["PreciseRxSampleIndex"] = createScalarMxArray(sdrExtra.hardwareRxSamplingIndex);
@@ -472,13 +480,13 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, matlab::data
     using namespace matlab::data;
     ArrayFactory factory;
     outCell[index]["StandardHeader"] = convertStandardHeader2MxArray(frame.standardHeader);
-    outCell[index]["RxSBasic"] = convertRxSBasic2MxArray(frame.rxSBasicSegment->getBasic());
-    outCell[index]["RxExtraInfo"] = convertExtraInfo2MxArray(frame.rxExtraInfoSegment->getExtraInfo());
+    outCell[index]["RxSBasic"] = convertRxSBasic2MxArray(*frame.rxSBasicSegment);
+    outCell[index]["RxExtraInfo"] = convertExtraInfo2MxArray(*frame.rxExtraInfoSegment);
     if (frame.mvmExtraSegment) {
         outCell[index]["MVMExtra"] = convertFrameSegmentViaDynamicInterpretation(*frame.mvmExtraSegment);
     }
     if (frame.sdrExtraSegment) {
-        outCell[index]["SDRExtra"] = convertSDRExtra2MxArray(frame.sdrExtraSegment->getSdrExtra());
+        outCell[index]["SDRExtra"] = convertSDRExtra2MxArray(*frame.sdrExtraSegment);
     }
     outCell[index]["CSI"] = convertCSISegment2MxArray(*frame.csiSegment);
     if (frame.PicoScenesHeader) {
@@ -487,7 +495,7 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, matlab::data
         outCell[index]["PicoScenesHeader"] = factory.createStructArray({1, 1}, {});
     }
     if (frame.txExtraInfoSegment) {
-        outCell[index]["TxExtraInfo"] = convertExtraInfo2MxArray(frame.txExtraInfoSegment->getExtraInfo());
+        outCell[index]["TxExtraInfo"] = convertExtraInfo2MxArray(*frame.txExtraInfoSegment);
     } else {
         outCell[index]["TxExtraInfo"] = factory.createStructArray({1, 1}, {});
     }
