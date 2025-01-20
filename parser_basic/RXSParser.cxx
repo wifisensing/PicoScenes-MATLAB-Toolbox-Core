@@ -476,19 +476,38 @@ matlab::data::StructArray convertSDRExtra2MxArray(const SDRExtraSegment &sdrExtr
     return sdrExtraArray;
 }
 
+matlab::data::StructArray convertTRxUnknowSegment2MxArray(std::map<std::string, std::shared_ptr<AbstractPicoScenesFrameSegment>>& unknownSegments) {
+    using namespace matlab::data;
+    ArrayFactory factory;
+    
+    std::vector<std::string> segmentNames;
+    segmentNames.reserve(unknownSegments.size());
+    for (const auto &segment : unknownSegments) {
+        segmentNames.push_back(segment.first);
+    }
+
+    StructArray trxForeignSegments = factory.createStructArray({1, 1}, segmentNames);
+    for (const auto &segment : unknownSegments) {
+        trxForeignSegments[0][segment.first] = convertFrameSegmentViaDynamicInterpretation(*segment.second);
+    }
+    return trxForeignSegments;
+}
+
 void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, matlab::data::StructArray &outCell, int index) {
     using namespace matlab::data;
     ArrayFactory factory;
     outCell[index]["StandardHeader"] = convertStandardHeader2MxArray(frame.standardHeader);
     outCell[index]["RxSBasic"] = convertRxSBasic2MxArray(*frame.rxSBasicSegment);
     outCell[index]["RxExtraInfo"] = convertExtraInfo2MxArray(*frame.rxExtraInfoSegment);
+    outCell[index]["CSI"] = convertCSISegment2MxArray(*frame.csiSegment);
+    outCell[index]["TxForeignSegments"] = convertTRxUnknowSegment2MxArray(frame.txUnknownSegments);
+    outCell[index]["RxForeignSegments"] = convertTRxUnknowSegment2MxArray(frame.rxUnknownSegments);
     if (frame.mvmExtraSegment) {
         outCell[index]["MVMExtra"] = convertFrameSegmentViaDynamicInterpretation(*frame.mvmExtraSegment);
     }
     if (frame.sdrExtraSegment) {
         outCell[index]["SDRExtra"] = convertSDRExtra2MxArray(*frame.sdrExtraSegment);
     }
-    outCell[index]["CSI"] = convertCSISegment2MxArray(*frame.csiSegment);
     if (frame.PicoScenesHeader) {
         outCell[index]["PicoScenesHeader"] = convertPicoScenesHeader2MxArray(*frame.PicoScenesHeader);
     } else {
@@ -499,26 +518,6 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, matlab::data
     } else {
         outCell[index]["TxExtraInfo"] = factory.createStructArray({1, 1}, {});
     }
-    std::vector<std::string> txSegmentNames;
-    for (const auto &txSegment : frame.txUnknownSegments) {
-        txSegmentNames.push_back(txSegment.first);
-    }
-    StructArray txForeignSegments = factory.createStructArray({1, 1}, txSegmentNames);
-    for (const auto &txSegment : frame.txUnknownSegments) {
-        txForeignSegments[0][txSegment.first] = convertFrameSegmentViaDynamicInterpretation(*txSegment.second);
-    }
-    outCell[index]["TxForeignSegments"] = txForeignSegments;
-
-    std::vector<std::string> rxSegmentNames;
-    for (const auto &rxSegment : frame.rxUnknownSegments) {
-        rxSegmentNames.push_back(rxSegment.first);
-    }
-    StructArray rxForeignSegments = factory.createStructArray({1, 1}, rxSegmentNames);
-    for (const auto &rxSegment : frame.rxUnknownSegments) {
-        rxForeignSegments[0][rxSegment.first] = convertFrameSegmentViaDynamicInterpretation(*rxSegment.second);
-    }
-    outCell[index]["RxForeignSegments"] = rxForeignSegments;
-
     if (frame.legacyCSISegment) {
         outCell[index]["LegacyCSI"] = convertCSISegment2MxArray(*frame.legacyCSISegment);
     }
