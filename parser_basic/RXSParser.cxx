@@ -3,6 +3,7 @@
     #include "CustomHeaderMapping.hxx"
 #endif
 
+#include "mex.hpp"
 #include "MatlabDataArray.hpp"
 #include "mexAdapter.hpp"
   
