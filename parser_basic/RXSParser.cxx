@@ -1,3 +1,4 @@
+#include "mex.h"
 #include "ModularPicoScenesFrame.hxx"
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
     #include "CustomHeaderMapping.hxx"
