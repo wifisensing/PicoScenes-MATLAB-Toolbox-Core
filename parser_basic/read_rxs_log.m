@@ -21,6 +21,7 @@ function results = read_rxs_log(filename, maxCSINumber)
         error('Cannot open file %s', filename);
     end
 
+    doInterpolation = ParserPreference.getPreference.doInterpolation;
     resultBatchSize = 10000;
     results = cell(resultBatchSize, 1);
     count = 1;
@@ -32,7 +33,7 @@ function results = read_rxs_log(filename, maxCSINumber)
         end
         fseek(fp, -4, 'cof');
         bytes=fread(fp, segmentLength,'uint8=>uint8');
-        csi_entry = RXSParser(bytes);
+        csi_entry = RXSParser(bytes, doInterpolation);
         if isempty(csi_entry) || isempty(fieldnames(csi_entry)) % in very rare case, the data is corrupted.
             continue;
         end

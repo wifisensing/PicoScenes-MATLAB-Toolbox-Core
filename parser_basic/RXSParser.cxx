@@ -450,10 +450,25 @@ mxArray *convertCSISegment2MxArray(const CSISegment &csiSegment) {
     auto *CSIData = copyComplexData2MxArray<double, float>(&csi->CSIArray.array[0], csi->CSIArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "CSI"), CSIData);
 
-    auto *magData = copyData2MxArray<double, float>(&csi->magnitudeArray.array[0], csi->magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    mxArray *magData, *phaseData;
+    // If CSI data is not interpolated, we need to manually compute magnitude and phase from CSI
+    if (csi->magnitudeArray.array.size() != csi->CSIArray.array.size()) {
+        std::vector<float> magValues(csi->CSIArray.array.size());
+        std::vector<float> phaseValues(csi->CSIArray.array.size());
+        
+        for (size_t i = 0; i < csi->CSIArray.array.size(); i++) {
+            magValues[i] = std::abs(csi->CSIArray.array[i]);
+            phaseValues[i] = std::arg(csi->CSIArray.array[i]);
+        }
+        
+        magData = copyData2MxArray<double, float>(magValues.data(), magValues.size(), csiDataDimensions.size(), csiDataDimensions.data());
+        phaseData = copyData2MxArray<double, float>(phaseValues.data(), phaseValues.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    } else {
+        magData = copyData2MxArray<double, float>(&csi->magnitudeArray.array[0], csi->magnitudeArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+        phaseData = copyData2MxArray<double, float>(&csi->phaseArray.array[0], csi->phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
+    }
+    
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "Mag"), magData);
-
-    auto *phaseData = copyData2MxArray<double, float>(&csi->phaseArray.array[0], csi->phaseArray.array.size(), csiDataDimensions.size(), csiDataDimensions.data());
     mxSetFieldByNumber(groupCell, 0, mxAddField(groupCell, "Phase"), phaseData);
 
     auto *indexData = copyData2MxArray<int16_t, int16_t>(&csi->subcarrierIndices[0], csi->subcarrierIndices.size());
@@ -611,8 +626,8 @@ void convertPicoScenesFrame2Struct(ModularPicoScenesRxFrame &frame, mxArray *out
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     /* check for proper number of arguments */
-    if (nrhs != 1) {
-        mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox :read_csi:nrhs", "One input required.");
+    if (nrhs != 2) {
+        mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:nrhs", "Two inputs required: byte buffer and interpolation flag.");
     }
     if (nlhs != 1) {
         mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:nlhs", "One output required.");
@@ -621,17 +636,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (!mxIsClass(prhs[0], "uint8")) {
         mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:notBytes", "Input must be a char array");
     }
+    if (!mxIsLogicalScalar(prhs[1])) {
+        mexErrMsgIdAndTxt("Wi-Fi Sensing Toolbox:read_csi:notLogical", "Interpolation flag must be a logical scalar");
+    }
 
     IntelMVMParsedCSIHeader::registerDefaultMVMHeaderInterpretation();
 #ifdef CUSTOM_HEADER_MAPPING_EXISTS
     CustomHeaderMapping::registerPrivateInterpretations();
 #endif
     uint8_T *inBytes = (uint8_T *)mxGetData(prhs[0]);
+    bool doInterpolation = mxIsLogicalScalarTrue(prhs[1]);
     auto bufferLength = mxGetNumberOfElements(prhs[0]);
-    if (auto frame = ModularPicoScenesRxFrame::fromBuffer(inBytes, bufferLength, true)) {
+    if (auto frame = ModularPicoScenesRxFrame::fromBuffer(inBytes, bufferLength, doInterpolation)) {
         // std::stringstream ss;
         // ss << *frame;
-        // printf("rxframe: %s\n", ss.str().c_str());
+        // mexPrintf("rxframe: %s\n", ss.str().c_str());
         mxArray *result;
         if (auto echoProbeReplyIt = std::find_if(frame->payloadSegments.cbegin(), frame->payloadSegments.cend(), [](const std::shared_ptr<PayloadSegment> &payloadSegment) {
                 return payloadSegment.get()->getPayloadData().payloadDescription == "EchoProbeReplyCSI" || payloadSegment.get()->getPayloadData().payloadDescription == "EchoProbeReplyFull";
@@ -651,7 +670,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             convertPicoScenesFrame2Struct(*frame, result, 1);  // fake the ack frame for the structual simplicity
             const auto &csiPayload = echoProbeCSIPayloadIt->get()->getPayloadData().payloadData;
             auto txCSISegment = CSISegment(csiPayload.data(), csiPayload.size());
-            txCSISegment.getCSI()->removeCSDAndInterpolateCSI();
+            if (doInterpolation) {
+                txCSISegment.getCSI()->removeCSDAndInterpolateCSI();
+            }
             auto *rxCSIGroups = convertCSISegment2MxArray(txCSISegment);
             mxSetFieldByNumber(result, 1, mxAddField(result, "CSI"), rxCSIGroups);
         }
@@ -661,7 +682,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             });
             echoProbeFullPacketIt != frame->payloadSegments.cend()) {
             const auto &rxFrameBuffer = echoProbeFullPacketIt->get()->getPayloadData().payloadData;
-            if (auto initiatingFrame = ModularPicoScenesRxFrame::fromBuffer(rxFrameBuffer.data(), rxFrameBuffer.size(), true)) {
+            if (auto initiatingFrame = ModularPicoScenesRxFrame::fromBuffer(rxFrameBuffer.data(), rxFrameBuffer.size(), doInterpolation)) {
                 convertPicoScenesFrame2Struct(*initiatingFrame, result, 1);
             }
         }
