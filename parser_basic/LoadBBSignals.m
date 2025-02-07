@@ -44,7 +44,7 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
         dimensions(1) = prod(dimensions);
         dimensions(2) = 1;
         if startRatio ~= 0 || endRatio ~= 1
-            warning('LoadBBSignals does not support partial loading for  column-major storage with >=2 dimensions, forced to full-length loading ...');
+            warning('LoadBBSignals does not support partial loading for column-major storage with >=2 dimensions, forced to full-length loading ...');
             startRatio = 0;
             endRatio = 1;
         end
@@ -93,13 +93,14 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
             temp = complex(temp(1:2:end), temp(2:2:end)); % slower but save memory
         end
 
-        temp = reshape(temp, [step dimensions(2:end)]);
+        temp = permute(reshape(temp, flip([step dimensions(2:end)])), flip(1:numDimensions));
 
-        data(readLines + 1 : readLines + step, :) = temp;
+        % use more ':' to support more dimensions
+        data(readLines + 1 : readLines + step, :, :, :, :, :) = temp;
         readLines = readLines + step;
     end
 
     if exist('columnMajorDimensions', 'var')
-        data = reshape(data, columnMajorDimensions);
+        data = reshape(data(:), columnMajorDimensions);
     end
 end

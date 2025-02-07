@@ -22,14 +22,34 @@ function writeBBSignals(signal, bbFileName, storageMajority, precision)
     else
         fwrite(fid, 'C', 'char');
     end
-    
+
     if ~isempty(precision)
-        if isfloat(signal) && strcmpi('int16', precision)
-            signal = cast(signal * 32768, precision);
-        elseif isfloat(signal) && strcmpi('int8', preendcision)
-            signal = cast(signal * 256, precision);
+        if isfloat(signal)
+            if strcmpi(precision, 'int16')
+                scaleFactor = 32768;
+            elseif strcmpi(precision, 'int8')
+                scaleFactor = 256;
+            else
+                scaleFactor = 1; % No scaling
+            end
         else
+            scaleFactor = 1; % No scaling for non-float data types
+        end
+        scaleResponse = input(['Apply default scale factor ', num2str(scaleFactor), '? Y/N/<custom scale factor> (Y=default, case ignored): '], 's');
+        if isempty(scaleResponse) || strcmpi(scaleResponse, 'Y')
+            signal = cast(signal * scaleFactor, precision);
+            disp(['Scale factor applied: ', num2str(scaleFactor)]);
+        elseif strcmpi(scaleResponse, 'N')
             signal = cast(signal, precision);
+        else
+            customScaleFactor = str2double(scaleResponse);
+            if isnan(customScaleFactor)
+                disp('Invalid scale factor entered. No scaling applied.');
+                signal = cast(signal, precision);
+            else
+                signal = cast(signal * customScaleFactor, precision);
+                disp(['Custom scale factor applied: ', num2str(customScaleFactor)]);
+            end
         end
     end
     
@@ -73,6 +93,10 @@ function writeBBSignals(signal, bbFileName, storageMajority, precision)
     
     fwrite(fid, signal, precision);
     fclose(fid);
+
+    disp(['.bbsignals file written: ' bbFilePath]);
+    fileInfo = dir(bbFilePath);
+    disp(['File size: ' num2str(fileInfo.bytes) ' bytes']);
 end
 
 function S = sizeof(V)
