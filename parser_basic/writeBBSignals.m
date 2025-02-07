@@ -1,5 +1,6 @@
 function writeBBSignals(signal, bbFileName, storageMajority, precision)
     if nargin < 3
+        % Default to row-major storage (counter-intuitive for MATLAB) for compatibility with LoadBBSignals (which relies on column-major storage)
         storageMajority = SignalStorageMajority.RowMajor;
     end
     

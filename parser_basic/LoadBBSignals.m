@@ -16,20 +16,14 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
 
     fileHeader = fread(fid, 2, 'char=>char');
     bbFileVersion = fread(fid, 2, 'char=>char');
-    if any(fileHeader' ~= 'BB') || (any(bbFileVersion' ~= 'v1') && any(bbFileVersion' ~= 'v2'))
+    if any(fileHeader' ~= 'BB') || any(bbFileVersion' ~= 'v2')
         error(' ** incompatible .bbsignals file format! **');
     end
 
     numDimensions = fread(fid, 1, 'uint8=>double');
     dimensions = ones(1, numDimensions);
-    if bbFileVersion(2) - 48 == 1
-        for i = 1: numDimensions
-            dimensions(i) = fread(fid, 1, 'int32=>double');
-         end
-    elseif bbFileVersion(2) - 48  == 2
-        for i = 1: numDimensions
-            dimensions(i) = fread(fid, 1, 'int64=>double');
-         end
+    for i = 1: numDimensions
+        dimensions(i) = fread(fid, 1, 'int64=>double');
     end
     isComplexMatrix = double(fread(fid, 1, 'char=>double') == 'C');
     typeChar = fread(fid, 1, 'char=>double');
@@ -44,6 +38,17 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
     rowsInFile = floor((fileSize - currentPos) / rowBytes);
     dimensions(1) = rowsInFile;
     disp(['Size: numDim=' num2str(numDimensions) ', dims=[' num2str(dimensions) '], fileSize=' num2str(fileSize/1e6) 'MB'])
+
+    if majority == SignalStorageMajority.ColumnMajor && prod(dimensions(2:end)) > 1
+        columnMajorDimensions = dimensions;
+        dimensions(1) = prod(dimensions);
+        dimensions(2) = 1;
+        if startRatio ~= 0 || endRatio ~= 1
+            warning('LoadBBSignals does not support partial loading for  column-major storage with >=2 dimensions, forced to full-length loading ...');
+            startRatio = 0;
+            endRatio = 1;
+        end
+    end
 
     readRatio = endRatio - startRatio;
     totalLines2Read = floor(readRatio * dimensions(1));
@@ -66,9 +71,9 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
     precision = [precision '=>double'];
 
     if isComplexMatrix
-        data = coder.nullcopy(zeros(totalLines2Read, 1, 'like', complex(0)));
+        data = coder.nullcopy(zeros([totalLines2Read dimensions(2:end)], 'like', complex(0)));
     else
-        data = coder.nullcopy(zeros(totalLines2Read, 1));
+        data = coder.nullcopy(zeros([totalLines2Read dimensions(2:end)]));
     end
 
     readLines = 0;
@@ -83,26 +88,18 @@ function data = loadBasebandSignalFile(bbFilePath, startRatio, endRatio)
 
         stepBytes2Read = step * 2^isComplexMatrix * prod(dimensions(2:end));
         temp = fread(fid, stepBytes2Read, precision);
-        
-        % if typeChar == 'I' && typeBits == 16
-        %     temp = temp / 32768;
-        % elseif typeChar == 'I' && typeBits == 8
-        %     temp = temp / 256;
-        % end
-    
+ 
         if isComplexMatrix
             temp = complex(temp(1:2:end), temp(2:2:end)); % slower but save memory
         end
 
-        data(readLines + 1 : readLines + step) = temp;
+        temp = reshape(temp, [step dimensions(2:end)]);
+
+        data(readLines + 1 : readLines + step, :) = temp;
         readLines = readLines + step;
     end
-    
-    if majority == SignalStorageMajority.ColumnMajor && dimensions(2) > 1
-        data = reshape(data, dimensions);
-    elseif majority == SignalStorageMajority.RowMajor && dimensions(2) > 1
-        data = reshape(data, flip(dimensions));
-        data = ipermute(data, numel(dimensions):-1:1);
+
+    if exist('columnMajorDimensions', 'var')
+        data = reshape(data, columnMajorDimensions);
     end
-    
 end
