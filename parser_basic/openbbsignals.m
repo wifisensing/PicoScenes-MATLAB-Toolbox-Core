@@ -12,8 +12,12 @@ function openbbsignals(filePath, varargin)
         
     end
 
+    fileInfo = dir(filePath);
+    disp(['File size: ', num2str(fileInfo.bytes / 1e6), ' MiB']);
+
+
     % Invoke BBSignalsFileLoader if exists, or load the data directly.
-    if exist('BBSignalsFileLoader', 'file')
+    if exist('BBSignalsFileLoader', 'file') && fileInfo.bytes > 200e6
         BBSignalsFileLoader(filePath);
     else
         LoadBBSignals(filePath, startRatio, endRatio);
