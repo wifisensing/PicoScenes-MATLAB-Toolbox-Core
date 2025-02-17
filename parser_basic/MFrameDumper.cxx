@@ -6,14 +6,15 @@
 #include "mex.hpp"
 #include "mexAdapter.hpp"
 #include "MatlabDataArray.hpp"
+#include "AntStateInfoSegment.hxx"
 
-// void printFieldNames(const matlab::data::StructArray& structData) {
-//     auto fieldNames = structData.getFieldNames();
-//     std::cout << "StructArray contains the following fields:" << std::endl;
-//     for (const auto& fieldName : fieldNames) {
-//         std::cout << "- " << static_cast<std::string>(fieldName) << std::endl;
-//     }
-// }
+//void printFieldNames(const matlab::data::StructArray& structData) {
+//    auto fieldNames = structData.getFieldNames();
+//    std::cout << "StructArray contains the following fields:" << std::endl;
+//    for (const auto& fieldName : fieldNames) {
+//        std::cout << "- " << static_cast<std::string>(fieldName) << std::endl;
+//    }
+//}
 
 inline bool hasField(const matlab::data::StructArray& inStruct, const std::string& fieldName) {
     return std::any_of(
@@ -638,6 +639,20 @@ U8Vector convertStruct2Mpdu(const matlab::data::Array& mpduData) {
     return mpdu;
 }
 
+std::shared_ptr<AbstractPicoScenesFrameSegment> convertStruct2RxForeignSegments(const matlab::data::StructArray& structData) {
+    std::string fieldName = "AntStateInfo";
+    if (!hasField(structData, fieldName)) {
+        return nullptr;
+    }
+
+    auto AntInfoField = structData[0][fieldName];
+    AntStateInfo antStateInfo;
+    antStateInfo.Angle = extractScalarField<double>(AntInfoField, "Angle");
+    antStateInfo.AntId = extractScalarField<uint8_t>(AntInfoField, "AntId");
+    AntStateInfoSegment segment(antStateInfo);
+    return std::make_shared<AntStateInfoSegment>(segment);
+}
+
 std::shared_ptr<BasebandSignalSegment> convertStruct2BasebandSignal(const matlab::data::TypedArray<std::complex<double>>& structData) {
     if (structData.isEmpty()) {
         return nullptr;
@@ -699,6 +714,12 @@ ModularPicoScenesRxFrame convertStructArray2Frame(const matlab::data::StructArra
     }
     if (hasField(structData, "BasebandSignals")) {
         frame.basebandSignalSegment = convertStruct2BasebandSignal(structData[index]["BasebandSignals"]);
+    }
+    if (hasField(structData, "RxForeignSegments")) {
+        auto rxForeignSegments = convertStruct2RxForeignSegments(structData[index]["RxForeignSegments"]);
+        if(rxForeignSegments) {
+           frame.rxUnknownSegments.insert({"AntStateInfo", rxForeignSegments});
+        }
     }
     
     frame.mpdus.emplace_back(convertStruct2Mpdu(structData[index]["MPDU"]));

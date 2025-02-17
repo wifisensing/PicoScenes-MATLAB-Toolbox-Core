@@ -15,11 +15,11 @@ function compileFrameDumper(skipExtraParam)
     end
     
     try
-        eval(['mex -silent -DBUILD_WITH_MEX CXXFLAGS="$CXXFLAGS -std=c++2a -Wno-attributes -O3" -I../rxs_parsing_core MFrameDumper.cxx ../rxs_parsing_core/*.cxx ../rxs_parsing_core/preprocess/generated/*.cpp ' extraParam]);
+        eval(['mex -silent -DBUILD_WITH_MEX CXXFLAGS="$CXXFLAGS -std=c++2a -Wno-attributes -O3" -I../rxs_parsing_core MFrameDumper.cxx AntStateInfoSegment.cxx ../rxs_parsing_core/*.cxx ../rxs_parsing_core/preprocess/generated/*.cpp ' extraParam]);
         disp('Compilation done!');
     catch 
         warning('Exception caught! Use verbose mode to build again.');
-        eval(['mex -v -DBUILD_WITH_MEX CXXFLAGS="$CXXFLAGS -std=c++2a -Wno-attributes -O3" -I../rxs_parsing_core MFrameDumper.cxx ../rxs_parsing_core/*.cxx ../rxs_parsing_core/preprocess/generated/*.cpp ' extraParam])
+        eval(['mex -v -DBUILD_WITH_MEX CXXFLAGS="$CXXFLAGS -std=c++2a -Wno-attributes -O3" -I../rxs_parsing_core MFrameDumper.cxx AntStateInfoSegment.cxx ../rxs_parsing_core/*.cxx ../rxs_parsing_core/preprocess/generated/*.cpp ' extraParam])
     end
     
     cd(currentDir);
